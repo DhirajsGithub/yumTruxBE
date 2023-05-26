@@ -15,7 +15,7 @@ const UserSchema = new Schema({
     type: String,
   },
   date: {
-    type: String,
+    type: Date,
   },
   username: {
     type: String,
@@ -27,7 +27,7 @@ const UserSchema = new Schema({
   orderHistory: {
     type: Object,
   },
-  promileImg: {
+  profileImg: {
     type: String,
   },
   phoneNo: {

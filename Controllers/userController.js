@@ -1,11 +1,14 @@
 const userModel = require("../Models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const uniqid = require("uniqid");
+const { uploadProfileImg } = require("../utils/cloudinary");
 
 const SECRET_KEY = "yumtruxsecret69";
 
 const reqDate = new Date();
 
+// /signup
 const signup = async (req, res) => {
   const { email, username, password } = req.body;
   try {
@@ -23,22 +26,27 @@ const signup = async (req, res) => {
       email,
       username,
       password: hashPass,
-      date: reqDate.toLocaleDateString(),
+      date: reqDate,
       fullName: "",
       favouriteTrucks: [],
       orderHistory: [],
-      promileImg: "",
-      phoneNo: 0,
+      profileImg: "",
+      phoneNo: "",
       address: "",
     });
 
     const token = jwt.sign({ email: result.email, id: result._id }, SECRET_KEY);
-    return res.status(201).json({ user: result, token });
+    return res
+      .status(201)
+      .json({ user: result, token, message: "Account created successfully" });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+// /signin
 const signin = async (req, res) => {
+  // can think of login with email or username as well
   const { email, password } = req.body;
 
   try {
@@ -63,4 +71,72 @@ const signin = async (req, res) => {
   }
 };
 
-module.exports = { signin, signup };
+// /orderHistory/:userId
+const orderHistory = async (req, res) => {
+  const userId = req.params.userId;
+  const order = req.body.order;
+  const newObjectId = uniqid();
+  try {
+    const findUser = await userModel
+      .findByIdAndUpdate(
+        { _id: userId },
+        { $push: { orderHistory: { ...order, orderId: newObjectId } } }
+      )
+
+      .then((user) => {
+        return res
+          .status(201)
+          .send("successfully added order to order history");
+      })
+      .catch((err) => {
+        return res.status(400).send("Couldn't find the user");
+      });
+  } catch (error) {
+    return res.status(500).send("Cannot add order at this moment");
+  }
+};
+
+// /updateUser/:userId
+const updateUser = async (req, res) => {
+  const fullName = req.body.fullName;
+  const phoneNo = req.body.phoneNo;
+  const address = req.body.address;
+  const profileImg = req.body.profileImg;
+  const userId = req.params.userId;
+  let uploadedImg = uploadProfileImg(profileImg, userId);
+
+  try {
+    const findUser = await userModel
+      .findByIdAndUpdate(
+        { _id: userId },
+        { fullName, phoneNo, address, profileImg: uploadedImg }
+      )
+      .then((user) => {
+        return res.status(201).send("Successfully updated user");
+      })
+      .catch((err) => {
+        return res.status(400).send("Couldn't find the user");
+      });
+  } catch (error) {
+    return res.status(500).send("Cannot update user at this moment");
+  }
+};
+
+// userDetails/:userId
+const userDetails = async (req, res) => {
+  const userId = req.params.userId;
+  try {
+    const findUser = await userModel
+      .findById({ _id: userId })
+      .then((user) => {
+        return res.status(201).send(user);
+      })
+      .catch((err) => {
+        return res.status(400).send("Couldn't find the user");
+      });
+  } catch (error) {
+    return res.status(500).send({ message: "Internal server error" });
+  }
+};
+
+module.exports = { signin, signup, orderHistory, updateUser, userDetails };
