@@ -1,4 +1,5 @@
 const userModel = require("../Models/User");
+const trucksModel = require("../Models/Truck");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const uniqid = require("uniqid");
@@ -103,15 +104,20 @@ const orderHistory = async (req, res) => {
       )
 
       .then((user) => {
-        return res
-          .status(201)
-          .send("successfully added order to order history");
+        return res.status(201).send({
+          message: "successfully added order to order history",
+          status: "success",
+        });
       })
       .catch((err) => {
-        return res.status(400).send("Couldn't find the user");
+        return res
+          .status(400)
+          .send({ message: "Couldn't find the user", status: "error" });
       });
   } catch (error) {
-    return res.status(500).send("Cannot add order at this moment");
+    return res
+      .status(500)
+      .send({ message: "Cannot add order at this moment", status: "error" });
   }
 };
 
@@ -165,13 +171,19 @@ const updateUser = async (req, res) => {
     const findUser = await userModel
       .findByIdAndUpdate({ _id: userId }, { fullName, phoneNo, address })
       .then((user) => {
-        return res.status(201).send("Successfully updated user");
+        return res
+          .status(201)
+          .send({ message: "Successfully updated user", status: "success" });
       })
       .catch((err) => {
-        return res.status(400).send("Couldn't find the user");
+        return res
+          .status(400)
+          .send({ message: "Couldn't find the user", status: "error" });
       });
   } catch (error) {
-    return res.status(500).send("Cannot update user at this moment");
+    return res
+      .status(500)
+      .send({ message: "Cannot update user at this moment", status: "error" });
   }
 };
 
@@ -198,6 +210,85 @@ const userDetails = async (req, res) => {
   }
 };
 
+// truckListDetail
+const truckListDetail = async (req, res) => {
+  try {
+    const trucks = await trucksModel
+      .find({})
+      .then((trucks) => {
+        return res
+          .status(201)
+          .send({ truckList: trucks, message: "success", status: "success" });
+      })
+      .catch((err) => {
+        return res
+          .status(400)
+          .send({ message: "Couldn't find trucks list", status: "error" });
+      });
+  } catch (error) {
+    req.status(500).send({ message: "Internal server error", status: "error" });
+  }
+};
+
+// /favouriteTrucks/:userId
+const updateFavTrucks = async (req, res) => {
+  const userId = req.params.userId;
+  const truckId = req.body.truckId;
+  const newObjectId = uniqid();
+  try {
+    const findUser = userModel
+      .findByIdAndUpdate(
+        { _id: userId },
+        { $push: { favouriteTrucks: { truckId, uniqueId: newObjectId } } }
+      )
+      .then((user) => {
+        return res.status(201).send({
+          message: "successfully added truck to favourite",
+          status: "success",
+        });
+      })
+      .catch((err) => {
+        return res
+          .status(400)
+          .send({ message: "Couldn't find the user", status: "error" });
+      });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Cannot update favourite truck at this moment",
+      status: "error",
+    });
+  }
+};
+
+// /favouriteTruckRemove/:userId
+const updateFavTrucksRemove = async (req, res) => {
+  const userId = req.params.userId;
+  const truckId = req.body.truckId;
+  try {
+    const findUser = userModel
+      .findByIdAndUpdate(
+        { _id: userId },
+        { $pull: { favouriteTrucks: { truckId } } }
+      )
+      .then((user) => {
+        return res.status(201).send({
+          message: "successfully remove truck from favourite",
+          status: "success",
+        });
+      })
+      .catch((err) => {
+        return res
+          .status(400)
+          .send({ message: "Couldn't find the user", status: "error" });
+      });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Cannot update favourite truck at this moment",
+      status: "error",
+    });
+  }
+};
+
 module.exports = {
   signin,
   signup,
@@ -205,4 +296,7 @@ module.exports = {
   updateUser,
   userDetails,
   updateProfileImg,
+  truckListDetail,
+  updateFavTrucks,
+  updateFavTrucksRemove,
 };
