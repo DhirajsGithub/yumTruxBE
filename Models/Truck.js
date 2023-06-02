@@ -24,7 +24,7 @@ const TruckSchema = new Schema({
     type: String,
   },
   ratings: {
-    type: Number,
+    type: Object,
   },
   menu: {
     type: Object,

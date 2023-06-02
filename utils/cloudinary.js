@@ -1,4 +1,4 @@
-const uploadProfileImg = async (imgPath, userId) => {
+const DeleteProfileImgCloudinary = async (userId) => {
   const cloudinary = require("cloudinary").v2;
 
   // Configuration
@@ -10,29 +10,17 @@ const uploadProfileImg = async (imgPath, userId) => {
 
   // Upload
 
-  // try {
-  //   let res = await cloudinary.uploader.upload(
-  //     "https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aHVtYW58ZW58MHx8MHx8fDA%3D&w=1000&q=80",
-  //     { public_id: userId, folder: "yumtrux_users", use_filename: false }
-  //   );
-  //   console.log(res);
-  //   return res.secure_url;
-  // } catch (error) {
-  //   console.log(error);
-  // }
-
-  // Generate
-  // const url = cloudinary.url("yumtrux_users/" + userId, {
-  //   width: 200,
-  //   height: 200,
-  //   format: "auto",
-  //   Crop: "size",
-  //   quality: "80",
-  // });
-
-  // The output url
-  // console.log(url);
-  // https://res.cloudinary.com/<cloud_name>/image/upload/h_150,w_100/olympic_flag
+  try {
+    let p = await cloudinary.uploader.destroy(
+      "yumtrux_users/" + userId,
+      function (err, result) {
+        return result;
+      }
+    );
+    return p;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-module.exports = { uploadProfileImg };
+module.exports = { DeleteProfileImgCloudinary };

@@ -3,7 +3,7 @@ const trucksModel = require("../Models/Truck");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const uniqid = require("uniqid");
-const { uploadProfileImg } = require("../utils/cloudinary");
+const { DeleteProfileImgCloudinary } = require("../utils/cloudinary");
 const multer = require("multer");
 
 const SECRET_KEY = "yumtruxsecret69";
@@ -34,7 +34,8 @@ const signup = async (req, res) => {
       fullName: "",
       favouriteTrucks: [],
       orderHistory: [],
-      profileImg: "",
+      profileImg:
+        "https://res.cloudinary.com/dk8hyxr2z/image/upload/v1685710777/yumtrux_users/defaultProfileImg_rrndub.webp",
       phoneNo: "",
       address: "",
     });
@@ -121,44 +122,41 @@ const orderHistory = async (req, res) => {
   }
 };
 
-// updateProfileImg/:userId
-const updateProfileImg = async (req, res) => {
+// uploadProfileImgMogogDB/:userId
+const uploadProfileImgMogogDB = async (req, res) => {
+  const imgUrl = req.body.imgUrl;
   const userId = req.params.userId;
-  const file = req.files.profileImg;
-  let uploadedImg = await uploadProfileImg(profileImg, userId);
-  console.log(JSON.stringify(red.body));
-  // let indexOfUpload = 0;
-  // let uploadWithSlahLength = 7; // upload/
-  // let finalUploadCompressImg = "";
-  // let compressParams = "h_200,q_80,w_200";
-  // if (uploadedImg) {
-  //   indexOfUpload = uploadedImg.indexOf("upload");
-  //   let newCompressUrl = uploadedImg.slice(
-  //     0,
-  //     indexOfUpload + uploadWithSlahLength
-  //   );
-  //   newCompressUrl =
-  //     newCompressUrl +
-  //     compressParams +
-  //     "/" +
-  //     uploadedImg.slice(indexOfUpload + uploadWithSlahLength);
-  //   if (newCompressUrl) {
-  //     // finalUploadCompressImg = await uploadProfileImg()
-  //   }
-  // }
+  try {
+    const findUser = await userModel
+      .findByIdAndUpdate({ _id: userId }, { profileImg: imgUrl })
+      .then((user) => {
+        return res.status(201).send({
+          message: "Successfully updated profile image",
+          status: "success",
+        });
+      })
+      .catch((err) => {
+        return res
+          .status(400)
+          .send({ message: "Couldn't find the user", status: "error" });
+      });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Cannot update profile image at this moment",
+      status: "error",
+    });
+  }
+};
 
-  // try {
-  //   const findUser = await userModel
-  //     .findByIdAndUpdate({ _id: userId }, { profileImg: uploadedImg })
-  //     .then((user) => {
-  //       return res.status(201).send("Successfully updated user Image");
-  //     })
-  //     .catch((err) => {
-  //       return res.status(400).send("Couldn't find the user");
-  //     });
-  // } catch (error) {
-  //   return res.status(500).send("Cannot update user Image at this moment");
-  // }
+// deleteProfileImg/:userId
+const deleteProfileImg = async (req, res) => {
+  const userId = req.params.userId;
+  try {
+    let uploadedImg = await DeleteProfileImgCloudinary(userId);
+    res.status(201).send(uploadedImg);
+  } catch (error) {
+    res.status(400).send("cannot delete");
+  }
 };
 
 // /updateUser/:userId
@@ -289,14 +287,41 @@ const updateFavTrucksRemove = async (req, res) => {
   }
 };
 
+const updateTruckRating = async (req, res) => {
+  const truckId = req.params.truckId;
+  const rating = req.body.rating;
+  try {
+    const findTruck = trucksModel
+      .findByIdAndUpdate({ _id: truckId }, { $push: { ratings: rating } })
+      .then((truck) => {
+        return res.status(201).send({
+          message: "successfully added rating",
+          status: "success",
+        });
+      })
+      .catch((err) => {
+        return res
+          .status(400)
+          .send({ message: "Couldn't find the truck", status: "error" });
+      });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Internal server error",
+      status: "error",
+    });
+  }
+};
+
 module.exports = {
   signin,
   signup,
   orderHistory,
   updateUser,
   userDetails,
-  updateProfileImg,
+  deleteProfileImg,
   truckListDetail,
   updateFavTrucks,
   updateFavTrucksRemove,
+  updateTruckRating,
+  uploadProfileImgMogogDB,
 };

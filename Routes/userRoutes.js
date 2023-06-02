@@ -5,10 +5,12 @@ const {
   orderHistory,
   updateUser,
   userDetails,
-  updateProfileImg,
+  deleteProfileImg,
   truckListDetail,
   updateFavTrucks,
   updateFavTrucksRemove,
+  updateTruckRating,
+  uploadProfileImgMogogDB,
 } = require("../Controllers/userController");
 const multer = require("multer");
 const userRoute = express.Router();
@@ -29,32 +31,12 @@ userRoute.patch("/favouriteTruckRemove/:userId", updateFavTrucksRemove);
 
 userRoute.get("/userDetails/:userId", userDetails);
 
-userRoute.post("/updateProfileImg/:userId", updateProfileImg);
+userRoute.post("/deleteProfileImg/:userId", deleteProfileImg);
+
+userRoute.patch("/uploadProfileImgMogogDB/:userId", uploadProfileImgMogogDB);
 
 userRoute.get("/truckListDetail", truckListDetail);
 
-module.exports = userRoute;
+userRoute.patch("/updateRating/:truckId", updateTruckRating);
 
-let p = {
-  items: [
-    {
-      itemId: 11,
-    },
-    {
-      itemId: 11,
-    },
-    {
-      itemId: 12,
-    },
-    {
-      itemId: 13,
-    },
-    {
-      itemId: 11,
-    },
-  ],
-  orderOn: "10:34 PM, May 14",
-  totalPrice: 124,
-  truckId: 1,
-  orderHistId: 43432,
-};
+module.exports = userRoute;
