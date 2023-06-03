@@ -5,7 +5,7 @@ const fileUpload = require("express-fileupload");
 const cors = require("cors");
 
 const app = express();
-const port = 8000; // we will have out react app on port 3000
+const port = process.env.PORT || 8000; // we will have out react app on port 3000
 const userRoutes = require("./Routes/userRoutes");
 const truckRoutes = require("./Routes/truckRoutes");
 const generalRoutes = require("./Routes/genralRoute");
