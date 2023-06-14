@@ -5,7 +5,7 @@ const TruckSchema = new Schema({
   name: {
     type: String, // truck name
   },
-  userName: {
+  username: {
     type: String,
   },
   password: {

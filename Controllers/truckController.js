@@ -3,48 +3,69 @@ const trucksModel = require("../Models/Truck");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const uniqid = require("uniqid");
+const { sendMail } = require("../utils/SendMail");
 const SECRET_KEY = "yumtruxsecret69";
 
+// /truck/signup
 const signup = async (req, res) => {
   const { email, username, password, phoneNo, address } = req.body;
   try {
-    const existingTruck = await trucksModel.findOne({
-      // username and email both should be unique
-      $or: [{ email: email }],
-    });
-    if (existingTruck) {
+    if (
+      email?.length > 0 &&
+      username?.length > 0 &&
+      password?.length > 0 &&
+      address?.length > 0 &&
+      phoneNo
+    ) {
+      const existingTruck = await trucksModel.findOne({
+        // username and email both should be unique
+        $or: [{ email: email }],
+      });
+      if (existingTruck) {
+        return res
+          .status(400)
+          .json({ message: "User already exist", status: "error" });
+      }
+
+      const hashPass = await bcrypt.hash(password, 8);
+
+      const result = await trucksModel.create({
+        name: "",
+        username,
+        password: hashPass,
+        email,
+        phoneNo,
+        schedule: [],
+        latLong: [],
+        description: "",
+        imgUrl:
+          "https://assets.traveltriangle.com/blog/wp-content/uploads/2019/08/shutterstock_1095843908.jpg",
+        address,
+        timing: "",
+        ratings: [],
+        menu: [],
+        paymentId: "",
+        balance: "",
+      });
+
+      const token = jwt.sign(
+        { email: result.email, id: result._id },
+        SECRET_KEY
+      );
+      return res.status(201).json({
+        truckData: result,
+        token,
+        message: "Account created successfully",
+        status: "success",
+      });
+    } else {
       return res
         .status(400)
-        .json({ message: "User already exist", status: "error" });
+        .json({
+          message: "email, password, username, address, phone number required",
+          status: "error",
+        });
     }
-
-    const hashPass = await bcrypt.hash(password, 8);
-
-    const result = await trucksModel.create({
-      name: "",
-      username,
-      password: hashPass,
-      email,
-      phoneNo,
-      schedule: [],
-      latLong: [],
-      description: "",
-      imgUrl: "",
-      address,
-      timing: "",
-      ratings: [],
-      menu: [],
-      paymentId: "",
-      balance: "",
-    });
-
-    const token = jwt.sign({ email: result.email, id: result._id }, SECRET_KEY);
-    return res.status(201).json({
-      truckData: result,
-      token,
-      message: "Account created successfully",
-      status: "success",
-    });
   } catch (error) {
     return res
       .status(500)
@@ -58,34 +79,41 @@ const signin = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const existingTruck = await trucksModel.findOne({
-      email: email,
-    });
-    if (!existingTruck) {
-      return res
-        .status(404)
-        .json({ message: "User not found", status: "error" });
-    }
+    if (email?.length > 0 && password?.length > 0) {
+      const existingTruck = await trucksModel.findOne({
+        email: email,
+      });
+      if (!existingTruck) {
+        return res
+          .status(404)
+          .json({ message: "User not found", status: "error" });
+      }
 
-    const matchPassword = await bcrypt.compare(
-      password,
-      existingTruck.password
-    );
-    if (!matchPassword) {
+      const matchPassword = await bcrypt.compare(
+        password,
+        existingTruck.password
+      );
+      if (!matchPassword) {
+        return res
+          .status(400)
+          .json({ message: "Password doesn't match", status: "error" });
+      }
+      const token = jwt.sign(
+        { email: existingTruck.email, id: existingTruck._id },
+        SECRET_KEY
+      );
+      sendMail(existingTruck.email, existingTruck.username);
+      return res.status(201).json({
+        truckData: existingTruck,
+        token,
+        status: "success",
+        message: "Successfully login",
+      });
+    } else {
       return res
         .status(400)
-        .json({ message: "Password doesn't match", status: "error" });
+        .json({ message: "email and password required", status: "error" });
     }
-    const token = jwt.sign(
-      { email: existingTruck.email, id: existingTruck._id },
-      SECRET_KEY
-    );
-    return res.status(201).json({
-      truckData: existingTruck,
-      token,
-      status: "success",
-      message: "Successfully login",
-    });
   } catch (error) {
     return res
       .status(500)
@@ -93,4 +121,201 @@ const signin = async (req, res) => {
   }
 };
 
-module.exports = { signup, signin };
+// /truck/upateBasicData/:truckId
+const upateBasicData = async (req, res) => {
+  const truckId = req.params.truckId;
+  const name = req.body.name;
+  const description = req.body.description;
+  const imgUrl = req.body.imgUrl;
+  const timing = req.body.timing;
+  try {
+    if (
+      name?.length > 0 &&
+      description?.length > 0 &&
+      imgUrl?.length > 0 &&
+      timing?.length > 0
+    ) {
+      const findTruck = await trucksModel
+        .findByIdAndUpdate(
+          { _id: truckId },
+          { name, description, imgUrl, timing }
+        )
+        .then((truck) => {
+          return res.status(201).send({
+            message: "Successfully updated truck basic data",
+            status: "success",
+          });
+        })
+        .catch((err) => {
+          return res
+            .status(400)
+            .send({ message: "Couldn't find the truck", status: "error" });
+        });
+    } else {
+      return res.status(400).send({
+        message: "required truck name, description, image url, timing",
+        status: "error",
+      });
+    }
+  } catch (error) {
+    return res.status(500).send({
+      message: "Cannot update truck data at this moment",
+      status: "error",
+    });
+  }
+};
+
+// /truck/addSchedule/:truckId
+const addSchedule = async (req, res) => {
+  const truckId = req.params.truckId;
+  const dateObj = req.body.dateObj;
+  const locations = req.body.locations;
+  const scheduleId = uniqid();
+  try {
+    if (locations?.length > 0 && dateObj) {
+      const findTruck = await trucksModel
+        .findByIdAndUpdate(
+          { _id: truckId },
+          { $push: { schedule: { dateObj, locations, scheduleId } } }
+        )
+        .then((truck) => {
+          return res.status(201).send({
+            message: "Successfully added truck schedule",
+            status: "success",
+          });
+        })
+        .catch((err) => {
+          return res
+            .status(400)
+            .send({ message: "Couldn't find the truck", status: "error" });
+        });
+    } else {
+      return res.status(400).send({
+        message: "required schedule array and date object",
+        status: "error",
+      });
+    }
+  } catch (error) {
+    return res.status(500).send({
+      message: "Cannot update truck schedule at this moment",
+      status: "error",
+    });
+  }
+};
+
+// /truck/deleteSchedule/:truckId/
+const deleteSchedule = async (req, res) => {
+  const truckId = req.params.truckId;
+  const scheduleId = req.body.scheduleId;
+  try {
+    if (scheduleId?.length > 0) {
+      const findTruck = await trucksModel
+        .findByIdAndUpdate(
+          { _id: truckId },
+          { $pull: { schedule: { scheduleId } } }
+        )
+        .then((truck) => {
+          return res.status(201).send({
+            message: "Successfully deleted truck schedule",
+            status: "success",
+          });
+        })
+        .catch((err) => {
+          return res
+            .status(400)
+            .send({ message: "Couldn't find the truck", status: "error" });
+        });
+    } else {
+      return res
+        .status(400)
+        .send({ message: "required schedule id", status: "error" });
+    }
+  } catch (error) {
+    return res.status(500).send({
+      message: "Cannot delete truck schedule at this moment",
+      status: "error",
+    });
+  }
+};
+
+// /truck/addTruckMenu/:truckId/
+const addTruckMenu = async (req, res) => {
+  const truckId = req.params.truckId;
+  const name = req.body.name;
+  const price = req.body.price;
+  const description = req.body.description;
+  const imgUrl = req.body.imgUrl;
+  const id = uniqid();
+  try {
+    if (name?.length > 0 && price && description?.length > 0) {
+      const findTruck = await trucksModel
+        .findByIdAndUpdate(
+          { _id: truckId },
+          { $push: { menu: { name, price, description, imgUrl, id } } }
+        )
+        .then((truck) => {
+          return res.status(201).send({
+            message: "Successfully added truck menu",
+            status: "success",
+          });
+        })
+        .catch((err) => {
+          return res
+            .status(400)
+            .send({ message: "Couldn't find the truck", status: "error" });
+        });
+    } else {
+      return res.status(400).send({
+        message: "required name, price and description of menu",
+        status: "error",
+      });
+    }
+  } catch (error) {
+    return res.status(500).send({
+      message: "Cannot add truck menu at this moment",
+      status: "error",
+    });
+  }
+};
+
+// /truck/deleteTruckMenu/:truckId/
+const deleteTruckMenu = async (req, res) => {
+  const truckId = req.params.truckId;
+  const id = req.body.menuId;
+  try {
+    if (id?.length > 0) {
+      const findTruck = await trucksModel
+        .findByIdAndUpdate({ _id: truckId }, { $pull: { menu: { id } } })
+        .then((truck) => {
+          return res.status(201).send({
+            message: "Successfully deleted truck menu",
+            status: "success",
+          });
+        })
+        .catch((err) => {
+          return res
+            .status(400)
+            .send({ message: "Couldn't find the truck", status: "error" });
+        });
+    } else {
+      return res
+        .status(400)
+        .send({ message: "required id of menu", status: "error" });
+    }
+  } catch (error) {
+    return res.status(500).send({
+      message: "Cannot delete truck menu at this moment",
+      status: "error",
+    });
+  }
+};
+
+module.exports = {
+  signup,
+  signin,
+  upateBasicData,
+  addSchedule,
+  deleteSchedule,
+  addTruckMenu,
+  deleteTruckMenu,
+};
