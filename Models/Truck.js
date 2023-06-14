@@ -3,6 +3,18 @@ const { Schema } = mongoose;
 
 const TruckSchema = new Schema({
   name: {
+    type: String, // truck name
+  },
+  userName: {
+    type: String,
+  },
+  password: {
+    type: String,
+  },
+  email: {
+    type: String,
+  },
+  phoneNo: {
     type: String,
   },
   schedule: {
@@ -28,6 +40,12 @@ const TruckSchema = new Schema({
   },
   menu: {
     type: Object,
+  },
+  paymentId: {
+    type: String,
+  },
+  balance: {
+    type: String,
   },
 });
 

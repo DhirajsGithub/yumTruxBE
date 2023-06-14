@@ -214,9 +214,23 @@ const truckListDetail = async (req, res) => {
     const trucks = await trucksModel
       .find({})
       .then((trucks) => {
+        let temp = [];
+        for (let truck of trucks) {
+          if (
+            truck.name.length > 0 &&
+            truck.schedule.length > 0 &&
+            truck.description.length > 0 &&
+            truck.imgUrl.includes("http") &&
+            truck.address.length > 0 &&
+            truck.timing.length > 0 &&
+            truck.menu.length > 0
+          ) {
+            temp.push(truck);
+          }
+        }
         return res
           .status(201)
-          .send({ truckList: trucks, message: "success", status: "success" });
+          .send({ truckList: temp, message: "success", status: "success" });
       })
       .catch((err) => {
         return res

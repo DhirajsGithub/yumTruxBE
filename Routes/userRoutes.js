@@ -12,10 +12,7 @@ const {
   updateTruckRating,
   uploadProfileImgMogogDB,
 } = require("../Controllers/userController");
-const multer = require("multer");
 const userRoute = express.Router();
-
-const uploads = multer();
 
 userRoute.post("/signup", signup);
 
