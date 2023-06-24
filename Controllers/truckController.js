@@ -59,12 +59,10 @@ const signup = async (req, res) => {
         status: "success",
       });
     } else {
-      return res
-        .status(400)
-        .json({
-          message: "email, password, username, address, phone number required",
-          status: "error",
-        });
+      return res.status(400).json({
+        message: "email, password, username, address, phone number required",
+        status: "error",
+      });
     }
   } catch (error) {
     return res
@@ -310,6 +308,36 @@ const deleteTruckMenu = async (req, res) => {
   }
 };
 
+// /truck/updatePaymentId/:truckId
+const updateStripePaymentId = async (req, res) => {
+  const truckId = req.params.truckId;
+  const paymentId = req.body.paymentId;
+  try {
+    if (paymentId?.length > 0) {
+      const findTruck = await trucksModel
+        .findByIdAndUpdate({ _id: truckId }, { paymentId })
+        .then((truck) => {
+          return res.status(201).send({
+            message: "Successfully updated payment id of truck",
+            status: "success",
+          });
+        })
+        .catch((err) => {
+          return res
+            .status(400)
+            .send({ message: "Couldn't find the truck", status: "error" });
+        });
+    } else {
+      return res.status(400).send({
+        message: "required payment id",
+        status: "error",
+      });
+    }
+  } catch (error) {
+    return res.status(500).send({ error: error.message });
+  }
+};
+
 module.exports = {
   signup,
   signin,
@@ -318,4 +346,5 @@ module.exports = {
   deleteSchedule,
   addTruckMenu,
   deleteTruckMenu,
+  updateStripePaymentId,
 };

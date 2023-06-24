@@ -32,11 +32,14 @@ const createConnectAccount = async (req, res) => {
 };
 
 const createConnectAccountLink = async (req, res) => {
+  const paymentId = req.body.paymentId;
+  const returnUrl = req.body.returnUrl;
+  const refreshUrl = req.body.refreshUrl;
   try {
     const accountLink = await stripe.accountLinks.create({
-      account: "acct_1NIp2u2R1Mv5frxK", // destination or let say truck owner destination
-      refresh_url: "https://example.com/reauth",
-      return_url: "https://example.com/return",
+      account: paymentId, // destination or let say truck owner destination
+      refresh_url: refreshUrl,
+      return_url: returnUrl,
       type: "account_onboarding",
     });
     return res.send(accountLink);
@@ -80,46 +83,14 @@ const createPaymentSheet = async (req, res) => {
   }
 };
 const checkBalance = async (req, res) => {
+  const paymentId = req.body.paymentId;
   try {
     const balance = await stripe.balance.retrieve({
-      stripeAccount: "acct_1NHmBwE7FFm6fD4o",
+      stripeAccount: paymentId,
     });
     return res.send(balance);
   } catch (error) {
     return res.send(error);
-  }
-};
-let clientId =
-  "AS56jlRioX6t4PMi_tolqYjmgeaUqiWbUenzHcTu0yao3JRncl6QSi5N9_kxR5wDa2Kxlz1m8_s3_Xc8";
-let secretKey =
-  "EJOSi5Jgob1o4VtxmKbRX-DjOGumDNm4galpIw7pOdLnKtZJ1RfZJK3-FAWdA8K-TJPJz-hFMHb0SC-C";
-const generatePaypalAccessToken = async () => {
-  const headers = new Headers();
-  headers.append("Content-Type", "application/x-www-form-urlencoded");
-  headers.set(
-    "Authorization",
-    "Basic " +
-      base64.encode(
-        "AS56jlRioX6t4PMi_tolqYjmgeaUqiWbUenzHcTu0yao3JRncl6QSi5N9_kxR5wDa2Kxlz1m8_s3_Xc8" +
-          ":" +
-          "EJOSi5Jgob1o4VtxmKbRX-DjOGumDNm4galpIw7pOdLnKtZJ1RfZJK3-FAWdA8K-TJPJz-hFMHb0SC-C"
-      )
-  );
-
-  const reqOptions = {
-    method: "POST",
-    headers: headers,
-    body: "grant_type=client_credentials",
-  };
-  try {
-    let res = await fetch("https://api-m.sandbox.paypal.com/v1/oauth2/token/", {
-      reqOptions,
-    });
-    res = await res.json();
-    console.log(res);
-    return res;
-  } catch (error) {
-    return error;
   }
 };
 
@@ -129,5 +100,4 @@ module.exports = {
   createConnectAccountLink,
   createPaymentSheet,
   checkBalance,
-  generatePaypalAccessToken,
 };
