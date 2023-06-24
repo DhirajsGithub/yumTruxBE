@@ -1,4 +1,5 @@
 require("dotenv").config();
+const base64 = require("base-64");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const createPaymentIntents = async (req, res) => {
@@ -88,6 +89,39 @@ const checkBalance = async (req, res) => {
     return res.send(error);
   }
 };
+let clientId =
+  "AS56jlRioX6t4PMi_tolqYjmgeaUqiWbUenzHcTu0yao3JRncl6QSi5N9_kxR5wDa2Kxlz1m8_s3_Xc8";
+let secretKey =
+  "EJOSi5Jgob1o4VtxmKbRX-DjOGumDNm4galpIw7pOdLnKtZJ1RfZJK3-FAWdA8K-TJPJz-hFMHb0SC-C";
+const generatePaypalAccessToken = async () => {
+  const headers = new Headers();
+  headers.append("Content-Type", "application/x-www-form-urlencoded");
+  headers.set(
+    "Authorization",
+    "Basic " +
+      base64.encode(
+        "AS56jlRioX6t4PMi_tolqYjmgeaUqiWbUenzHcTu0yao3JRncl6QSi5N9_kxR5wDa2Kxlz1m8_s3_Xc8" +
+          ":" +
+          "EJOSi5Jgob1o4VtxmKbRX-DjOGumDNm4galpIw7pOdLnKtZJ1RfZJK3-FAWdA8K-TJPJz-hFMHb0SC-C"
+      )
+  );
+
+  const reqOptions = {
+    method: "POST",
+    headers: headers,
+    body: "grant_type=client_credentials",
+  };
+  try {
+    let res = await fetch("https://api-m.sandbox.paypal.com/v1/oauth2/token/", {
+      reqOptions,
+    });
+    res = await res.json();
+    console.log(res);
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
 
 module.exports = {
   createPaymentIntents,
@@ -95,4 +129,5 @@ module.exports = {
   createConnectAccountLink,
   createPaymentSheet,
   checkBalance,
+  generatePaypalAccessToken,
 };

@@ -5,6 +5,7 @@ const {
   createConnectAccountLink,
   createPaymentSheet,
   checkBalance,
+  generatePaypalAccessToken,
 } = require("../Controllers/paymentController");
 const router = express.Router();
 
@@ -18,5 +19,7 @@ router.post("/createConnectAccountLink", createConnectAccountLink);
 router.post("/createPaymentSheet", createPaymentSheet);
 
 router.post("/checkBalance", checkBalance);
+
+router.post("/paypalAccessToken", generatePaypalAccessToken);
 
 module.exports = router;
