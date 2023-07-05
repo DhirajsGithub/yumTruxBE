@@ -47,6 +47,12 @@ const TruckSchema = new Schema({
   balance: {
     type: String,
   },
+  paypalEmail: {
+    type: String,
+  },
+  orders: {
+    type: Object,
+  },
 });
 
 module.exports = mongoose.model("truck", TruckSchema);

@@ -94,10 +94,172 @@ const checkBalance = async (req, res) => {
   }
 };
 
+// paypal payment flow
+
+// /payments/generatePaypalAccessToken
+const generatePaypalAccessToken = async (req, res) => {
+  const paypalUrl = "https://api-m.sandbox.paypal.com/v1/oauth2/token";
+  const headers = {
+    Accept: "application/json",
+    "Accept-Language": "en_US",
+    Authorization:
+      "Basic " +
+      Buffer.from(
+        `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_SECRET_KEY}`
+      ).toString("base64"),
+    "Content-Type": "application/x-www-form-urlencoded",
+  };
+  const body = "grant_type=client_credentials";
+  try {
+    let token = await fetch(paypalUrl, {
+      method: "POST",
+      headers: headers,
+      body: body,
+    });
+    token = await token.json();
+    return res.send(token);
+  } catch (error) {
+    return res.send(error);
+  }
+};
+
+// /payments/generatePaypalSignupLink
+const generatePaypalSignupLink = async (req, res) => {
+  let bearerToken = req.body.bearerToken;
+
+  const paypalUrl =
+    "https://api-m.sandbox.paypal.com/v2/customer/partner-referrals";
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${bearerToken}`,
+  };
+  const body = JSON.stringify({
+    tracking_id: "TRACKING-ID",
+    operations: [
+      {
+        operation: "API_INTEGRATION",
+        api_integration_preference: {
+          rest_api_integration: {
+            integration_method: "PAYPAL",
+            integration_type: "THIRD_PARTY",
+            third_party_details: {
+              features: ["PAYMENT", "REFUND"],
+            },
+          },
+        },
+      },
+    ],
+    products: ["EXPRESS_CHECKOUT"],
+    legal_consents: [
+      {
+        type: "SHARE_DATA_CONSENT",
+        granted: true,
+      },
+    ],
+  });
+
+  try {
+    let signUpData = await fetch(paypalUrl, {
+      method: "POST",
+      headers: headers,
+      body: body,
+    });
+    signUpData = await signUpData.json();
+    return res.send(signUpData);
+  } catch (error) {
+    return res.send(error);
+  }
+};
+
+const capturePaypalPayment = async () => {
+  try {
+    const response = await fetch(
+      `https://api-m.sandbox.paypal.com/v2/checkout/orders/3H160699JR890330G/capture`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization:
+            "Bearer A21AAJ58RLhgLBw4N2obAjkWUMa_lbE2VZXR6s9ZjumRcCPiAI9Qru4s7qigpc6kr1OzjFb52QSNyC77ri32mWwDYib-5TeBw",
+        },
+      }
+    );
+    return await response.json();
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+// /payments/createPaypalOrder
+const createPaypalOrder = async (req, res) => {
+  const bearerToken = req.body.bearerToken;
+  const amount = req.body.amount;
+  const sellerPaypalEmail = req.body.sellerPaypalEmail;
+  const orderUrl = "https://api-m.sandbox.paypal.com/v2/checkout/orders";
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: "Bearer " + bearerToken,
+  };
+
+  const body = {
+    intent: "CAPTURE",
+    purchase_units: [
+      {
+        amount: {
+          currency_code: "USD",
+          value: amount,
+        },
+        payee: {
+          email_address: sellerPaypalEmail,
+        },
+        payment_instruction: {
+          disbursement_mode: "INSTANT",
+          platform_fees: [
+            {
+              amount: {
+                currency_code: "USD",
+                value: "00.00",
+              },
+            },
+          ],
+        },
+      },
+    ],
+  };
+  if (
+    bearerToken?.length > 0 &&
+    String(amount)?.length > 0 &&
+    sellerPaypalEmail?.length > 0
+  ) {
+    try {
+      await capturePaypalPayment();
+      let response = await fetch(orderUrl, {
+        headers,
+        method: "POST",
+        body: JSON.stringify(body),
+      });
+      console.log(response);
+      response = await response.json();
+      return res.status(201).send(response);
+    } catch (error) {
+      return res.status(500).send(error);
+    }
+  } else {
+    return res
+      .status(401)
+      .send("Please provide bearer token, amount and seller paypal email");
+  }
+};
+
 module.exports = {
   createPaymentIntents,
   createConnectAccount,
   createConnectAccountLink,
   createPaymentSheet,
   checkBalance,
+  generatePaypalAccessToken,
+  generatePaypalSignupLink,
+  createPaypalOrder,
+  capturePaypalPayment,
 };

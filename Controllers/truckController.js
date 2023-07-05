@@ -338,6 +338,36 @@ const updateStripePaymentId = async (req, res) => {
   }
 };
 
+// /truck/updatePaypalEmail/:truckId
+const updatePaypalEmail = async (req, res) => {
+  const truckId = req.params.truckId;
+  const paypalEmail = req.body.paypalEmail;
+  try {
+    if (paypalEmail?.length > 0) {
+      const findTruck = await trucksModel
+        .findByIdAndUpdate({ _id: truckId }, { paypalEmail })
+        .then((truck) => {
+          return res.status(201).send({
+            message: "Successfully updated paypal email of truck",
+            status: "success",
+          });
+        })
+        .catch((err) => {
+          return res
+            .status(400)
+            .send({ message: "Couldn't find the truck", status: "error" });
+        });
+    } else {
+      return res.status(400).send({
+        message: "required paypal email id",
+        status: "error",
+      });
+    }
+  } catch (error) {
+    return res.status(500).send({ error: error.message });
+  }
+};
+
 module.exports = {
   signup,
   signin,
@@ -347,4 +377,5 @@ module.exports = {
   addTruckMenu,
   deleteTruckMenu,
   updateStripePaymentId,
+  updatePaypalEmail,
 };
