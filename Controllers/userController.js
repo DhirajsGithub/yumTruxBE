@@ -40,7 +40,7 @@ const signup = async (req, res) => {
       address: "",
     });
 
-    const token = jwt.sign({ email: result.email, id: result._id }, SECRET_KEY, { expiresIn: 50 });
+    const token = jwt.sign({ email: result.email, id: result._id }, SECRET_KEY);
     return res.status(201).json({
       user: result,
       token,
@@ -77,9 +77,8 @@ const signin = async (req, res) => {
     }
     const payload = { id: existingUser._id, email: existingUser.email }
     const secretKey = SECRET_KEY;
-    const options = { expiresIn: '1h' };
 
-    const token = jwt.sign(payload, secretKey, options);
+    const token = jwt.sign(payload, secretKey);
 
     return res.status(201).json({
       user: existingUser,
