@@ -133,7 +133,6 @@ const truckDetails = async (req, res) => {
           .send({ user, message: "success", status: "success" });
       })
       .catch((err) => {
-        console.log(err);
         return res
           .status(400)
           .send({ message: "Couldn't find the user", status: "error" });
@@ -264,6 +263,7 @@ const addTruckMenu = async (req, res) => {
   const description = req.body.description;
   const imgUrl = req.body.imgUrl;
   const id = uniqid();
+
   try {
     if (name?.length > 0 && price && description?.length > 0) {
       const findTruck = await trucksModel
@@ -279,17 +279,17 @@ const addTruckMenu = async (req, res) => {
         })
         .catch((err) => {
           return res
-            .status(400)
+            .status(201)
             .send({ message: "Couldn't find the truck", status: "error" });
         });
     } else {
-      return res.status(400).send({
+      return res.status(201).send({
         message: "required name, price and description of menu",
         status: "error",
       });
     }
   } catch (error) {
-    return res.status(500).send({
+    return res.status(201).send({
       message: "Cannot add truck menu at this moment",
       status: "error",
     });
@@ -306,7 +306,7 @@ const deleteTruckMenu = async (req, res) => {
         .findByIdAndUpdate({ _id: truckId }, { $pull: { menu: { id } } })
         .then((truck) => {
           return res.status(201).send({
-            message: "Successfully deleted truck menu",
+            message: "Successfully de§leted truck menu",
             status: "success",
           });
         })

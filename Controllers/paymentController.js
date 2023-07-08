@@ -26,7 +26,6 @@ const createConnectAccount = async (req, res) => {
     });
     return res.send(account);
   } catch (error) {
-    console.log(error);
     return error.message;
   }
 };
@@ -44,7 +43,6 @@ const createConnectAccountLink = async (req, res) => {
     });
     return res.send(accountLink);
   } catch (error) {
-    console.log(error);
     return res.send(error);
   }
 };
@@ -239,7 +237,6 @@ const createPaypalOrder = async (req, res) => {
         method: "POST",
         body: JSON.stringify(body),
       });
-      console.log(response);
       response = await response.json();
       return res.status(201).send(response);
     } catch (error) {
