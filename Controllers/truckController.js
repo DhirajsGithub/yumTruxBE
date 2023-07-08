@@ -51,7 +51,8 @@ const signup = async (req, res) => {
 
       const token = jwt.sign(
         { email: result.email, id: result._id },
-        SECRET_KEY
+        SECRET_KEY,
+        { expiresIn: "2d" }
       );
       return res.status(201).json({
         truckData: result,
@@ -99,7 +100,8 @@ const signin = async (req, res) => {
       }
       const token = jwt.sign(
         { email: existingTruck.email, id: existingTruck._id },
-        SECRET_KEY
+        SECRET_KEY,
+        { expiresIn: "2d" }
       );
       sendMail(existingTruck.email, existingTruck.username);
       return res.status(201).json({
@@ -117,6 +119,29 @@ const signin = async (req, res) => {
     return res
       .status(500)
       .json({ message: "Internal server error", status: "success" });
+  }
+};
+//truckDetails
+const truckDetails = async (req, res) => {
+  const userId = req.params.truckId;
+  try {
+    const findUser = await trucksModel
+      .findById({ _id: userId })
+      .then((user) => {
+        return res
+          .status(201)
+          .send({ user, message: "success", status: "success" });
+      })
+      .catch((err) => {
+        console.log(err);
+        return res
+          .status(400)
+          .send({ message: "Couldn't find the user", status: "error" });
+      });
+  } catch (error) {
+    return res
+      .status(500)
+      .send({ message: "Internal server error", status: "error" });
   }
 };
 
@@ -451,4 +476,5 @@ module.exports = {
   updatePaypalEmail,
   passwordReset,
   sendEmailForPasswordReset,
+  truckDetails,
 };

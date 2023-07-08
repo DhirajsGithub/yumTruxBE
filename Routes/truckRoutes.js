@@ -11,12 +11,15 @@ const {
   updatePaypalEmail,
   passwordReset,
   sendEmailForPasswordReset,
+  truckDetails,
 } = require("../Controllers/truckController");
+
 const truckRoute = express.Router();
 
 // /truck
 truckRoute.post("/signup", signup);
 truckRoute.post("/signin", signin);
+truckRoute.get("/truckDetails/:truckId", truckDetails);
 truckRoute.patch("/upateBasicData/:truckId", upateBasicData);
 truckRoute.patch("/addSchedule/:truckId", addSchedule);
 truckRoute.patch("/deleteSchedule/:truckId", deleteSchedule);

@@ -11,12 +11,15 @@ const {
   updateFavTrucksRemove,
   updateTruckRating,
   uploadProfileImgMogogDB,
+  validate
 } = require("../Controllers/userController");
 const userRoute = express.Router();
 
 userRoute.post("/signup", signup);
 
 userRoute.post("/signin", signin);
+
+userRoute.post("/validate", validate);
 
 userRoute.patch("/orderHistory/:userId", orderHistory);
 
