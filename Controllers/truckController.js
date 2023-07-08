@@ -131,7 +131,7 @@ const truckDetails = async (req, res) => {
           .send({ user, message: "success", status: "success" });
       })
       .catch((err) => {
-        console.log(err)
+
         return res
           .status(400)
           .send({ message: "Couldn't find the user", status: "error" });
@@ -262,7 +262,6 @@ const deleteSchedule = async (req, res) => {
 
 // /truck/addTruckMenu/:truckId/
 const addTruckMenu = async (req, res) => {
-  console.log("dd")
   const truckId = req.params.truckId;
   const name = req.body.name;
   const price = req.body.price;
@@ -286,7 +285,6 @@ const addTruckMenu = async (req, res) => {
           });
         })
         .catch((err) => {
-          console.log(err)
           return res
             .status(201)
             .send({ message: "Couldn't find the truck", status: "error" });
@@ -298,7 +296,6 @@ const addTruckMenu = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log(error)
     return res.status(201).send({
       message: "Cannot add truck menu at this moment",
       status: "error",
