@@ -27,7 +27,7 @@ const TruckSchema = new Schema({
     type: String,
   },
   imgUrl: {
-    type: String,
+    type: Object,
   },
   address: {
     type: String,

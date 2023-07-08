@@ -9,7 +9,9 @@ const {
   deleteTruckMenu,
   updateStripePaymentId,
   updatePaypalEmail,
-  truckDetails
+  passwordReset,
+  sendEmailForPasswordReset,
+  truckDetails,
 } = require("../Controllers/truckController");
 
 const truckRoute = express.Router();
@@ -30,10 +32,15 @@ truckRoute.patch("/addTruckMenu/:truckId", addTruckMenu);
 
 truckRoute.patch("/deleteTruckMenu/:truckId", deleteTruckMenu);
 
-
 truckRoute.put("/updateStripePaymentId/:truckId", updateStripePaymentId);
 
 // /truck/updatePaypalEmail/:truckId  --> will update seller's paypal email in db when it's onboarding is done
 truckRoute.put("/updatePaypalEmail/:truckId", updatePaypalEmail);
 
-module.exports = truckRoute; 
+// truck/sendEmailForPasswordReset  --> run this api first, it will return email and otp
+truckRoute.post("/sendEmailForPasswordReset", sendEmailForPasswordReset);
+
+// truck/passwordReset    --> run this api after /sendEmailForPasswordReset
+truckRoute.post("/passwordReset", passwordReset);
+
+module.exports = truckRoute;

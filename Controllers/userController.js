@@ -303,6 +303,7 @@ const updateFavTrucksRemove = async (req, res) => {
   }
 };
 
+// /updateRating/:truckId
 const updateTruckRating = async (req, res) => {
   const truckId = req.params.truckId;
   const rating = req.body.rating;
