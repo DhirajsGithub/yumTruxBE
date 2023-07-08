@@ -21,9 +21,13 @@ truckRoute.post("/signin", signin);
 truckRoute.get("/truckDetails/:truckId", truckDetails);
 
 truckRoute.patch("/upateBasicData/:truckId", upateBasicData);
+
 truckRoute.patch("/addSchedule/:truckId", addSchedule);
+
 truckRoute.patch("/deleteSchedule/:truckId", deleteSchedule);
+
 truckRoute.patch("/addTruckMenu/:truckId", addTruckMenu);
+
 truckRoute.patch("/deleteTruckMenu/:truckId", deleteTruckMenu);
 
 

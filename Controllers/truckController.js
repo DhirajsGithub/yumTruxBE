@@ -170,11 +170,11 @@ const upateBasicData = async (req, res) => {
         })
         .catch((err) => {
           return res
-            .status(400)
+            .status(201)
             .send({ message: "Couldn't find the truck", status: "error" });
         });
     } else {
-      return res.status(400).send({
+      return res.status(201).send({
         message: "required truck name, description, image url, timing",
         status: "error",
       });
@@ -190,9 +190,10 @@ const upateBasicData = async (req, res) => {
 // /truck/addSchedule/:truckId
 const addSchedule = async (req, res) => {
   const truckId = req.params.truckId;
-  const dateObj = req.body.dateObj;
-  const locations = req.body.locations;
+  const dateObj = req.body.schedule[0].dateObj;
+  const locations = req.body.schedule[0].locations;
   const scheduleId = uniqid();
+
   try {
     if (locations?.length > 0 && dateObj) {
       const findTruck = await trucksModel
@@ -208,11 +209,11 @@ const addSchedule = async (req, res) => {
         })
         .catch((err) => {
           return res
-            .status(400)
+            .status(201)
             .send({ message: "Couldn't find the truck", status: "error" });
         });
     } else {
-      return res.status(400).send({
+      return res.status(201).send({
         message: "required schedule array and date object",
         status: "error",
       });
