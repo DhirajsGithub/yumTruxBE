@@ -190,9 +190,10 @@ const upateBasicData = async (req, res) => {
 // /truck/addSchedule/:truckId
 const addSchedule = async (req, res) => {
   const truckId = req.params.truckId;
-  const dateObj = req.body.dateObj;
-  const locations = req.body.locations;
+  const dateObj = req.body ? req.body.schedule[0].dateObj : null;
+  const locations = req.body ? req.body.schedule[0].locations : null;
   const scheduleId = uniqid();
+
   try {
     if (locations?.length > 0 && dateObj) {
       const findTruck = await trucksModel
