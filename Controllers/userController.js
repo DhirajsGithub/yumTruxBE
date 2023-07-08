@@ -40,7 +40,7 @@ const signup = async (req, res) => {
       address: "",
     });
 
-    const token = jwt.sign({ email: result.email, id: result._id }, SECRET_KEY);
+    const token = jwt.sign({ email: result.email, id: result._id }, SECRET_KEY, { expiresIn: 50 });
     return res.status(201).json({
       user: result,
       token,
@@ -75,16 +75,19 @@ const signin = async (req, res) => {
         .status(400)
         .json({ message: "Password doesn't match", status: "error" });
     }
-    const token = jwt.sign(
-      { email: existingUser.email, id: existingUser._id },
-      SECRET_KEY
-    );
+    const payload = { id: existingUser._id, email: existingUser.email }
+    const secretKey = SECRET_KEY;
+    const options = { expiresIn: '1h' };
+
+    const token = jwt.sign(payload, secretKey, options);
+
     return res.status(201).json({
       user: existingUser,
       token,
       status: "success",
       message: "Successfully login",
     });
+
   } catch (error) {
     return res
       .status(500)
@@ -326,6 +329,39 @@ const updateTruckRating = async (req, res) => {
   }
 };
 
+const checkToken = (token) => {
+  try {
+    const decoded = jwt.verify(token, SECRET_KEY);
+    return true;
+  } catch (error) {
+    return false
+  }
+};
+
+const validate = async (req, res) => {
+  if (req.body.token) {
+    const isValid = checkToken(req.body.token);
+
+    if (isValid) {
+      res.status(200).send({
+        message: "Token is valid!",
+        status: "success",
+      });
+    } else {
+      res.status(201).send({
+        message: "Token is invalid or expired!",
+        status: "error",
+      });
+    }
+  } else {
+    res.status(201).send({
+      message: "No token is provided",
+      status: "error",
+    });
+  }
+};
+
+
 module.exports = {
   signin,
   signup,
@@ -338,4 +374,5 @@ module.exports = {
   updateFavTrucksRemove,
   updateTruckRating,
   uploadProfileImgMogogDB,
+  validate
 };
