@@ -219,7 +219,7 @@ const truckListDetail = async (req, res) => {
         for (let truck of trucks) {
           if (
             truck.name.length > 0 &&
-            // truck.schedule.length > 0 &&
+            truck.schedule.length > 0 &&
             truck.description.length > 0 &&
             truck.imgUrl.includes("http") &&
             truck.address.length > 0 &&

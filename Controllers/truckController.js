@@ -5,8 +5,6 @@ const jwt = require("jsonwebtoken");
 const uniqid = require("uniqid");
 const { sendMail } = require("../utils/SendMail");
 const SECRET_KEY = "yumtruxsecret69";
-const { PasswordResetMail } = require("../utils/PasswordResetMail");
-const otpGenerator = require("otp-generator");
 
 // /truck/signup
 const signup = async (req, res) => {
@@ -40,7 +38,8 @@ const signup = async (req, res) => {
         schedule: [],
         latLong: [],
         description: "",
-        imgUrl: [],
+        imgUrl:
+          "https://assets.traveltriangle.com/blog/wp-content/uploads/2019/08/shutterstock_1095843908.jpg",
         address,
         timing: "",
         ratings: [],
@@ -149,11 +148,20 @@ const upateBasicData = async (req, res) => {
   const truckId = req.params.truckId;
   const name = req.body.name;
   const description = req.body.description;
+  const imgUrl = req.body.imgUrl;
   const timing = req.body.timing;
   try {
-    if (name?.length > 0 && description?.length > 0 && timing?.length > 0) {
+    if (
+      name?.length > 0 &&
+      description?.length > 0 &&
+      imgUrl?.length > 0 &&
+      timing?.length > 0
+    ) {
       const findTruck = await trucksModel
-        .findByIdAndUpdate({ _id: truckId }, { name, description, timing })
+        .findByIdAndUpdate(
+          { _id: truckId },
+          { name, description, imgUrl, timing }
+        )
         .then((truck) => {
           return res.status(201).send({
             message: "Successfully updated truck basic data",
@@ -162,11 +170,11 @@ const upateBasicData = async (req, res) => {
         })
         .catch((err) => {
           return res
-            .status(400)
+            .status(201)
             .send({ message: "Couldn't find the truck", status: "error" });
         });
     } else {
-      return res.status(400).send({
+      return res.status(201).send({
         message: "required truck name, description, image url, timing",
         status: "error",
       });
@@ -179,15 +187,13 @@ const upateBasicData = async (req, res) => {
   }
 };
 
-// truck/updateTruckImgs/:truckId
-const updateTruckImgs = async (req, res) => {};
-
 // /truck/addSchedule/:truckId
 const addSchedule = async (req, res) => {
   const truckId = req.params.truckId;
-  const dateObj = req.body.dateObj;
-  const locations = req.body.locations;
+  const dateObj = req.body ? req.body.schedule[0].dateObj : null;
+  const locations = req.body ? req.body.schedule[0].locations : null;
   const scheduleId = uniqid();
+
   try {
     if (locations?.length > 0 && dateObj) {
       const findTruck = await trucksModel
@@ -388,82 +394,6 @@ const updatePaypalEmail = async (req, res) => {
   }
 };
 
-// /sendEmailForPasswordReset
-const sendEmailForPasswordReset = async (req, res) => {
-  const email = req.body.email;
-  if (email?.length > 0) {
-    try {
-      const findTruck = await trucksModel.findOne({ email }).then((truck) => {
-        if (truck) {
-          const generatedOtp = otpGenerator.generate(5, {
-            upperCaseAlphabets: false,
-            specialChars: false,
-            lowerCaseAlphabets: false,
-          });
-          let info = PasswordResetMail(email, generatedOtp);
-          return res.status(200).send({
-            message: "Email sent successfully",
-            status: "success",
-            email,
-            generatedOtp,
-          });
-        } else {
-          return res
-            .status(400)
-            .send({ message: "Couldn't find the truck", status: "error" });
-        }
-      });
-    } catch (error) {
-      return res.status(500).send({ error: error.message });
-    }
-  } else {
-    return res.status(400).send({ message: "Require email", status: "error" });
-  }
-};
-
-// /passwordReset
-const passwordReset = async (req, res) => {
-  const generatedOtp = req.body.generatedOtp;
-  const email = req.body.email;
-  const inputOtp = req.body.inputOtp;
-  const newPassword = req.body.newPassword;
-  try {
-    if (inputOtp === generatedOtp) {
-      if (newPassword?.length > 0 && email?.length > 0) {
-        const hashPass = await bcrypt.hash(newPassword, 8);
-        let doc = await trucksModel.findOneAndUpdate(
-          { email },
-          { password: hashPass }
-        );
-
-        if (doc) {
-          return res.status(200).send({
-            message: "Password successfully updated",
-            status: "error",
-          });
-        } else {
-          return res.status(400).send({
-            message: "Couldn't find the truck",
-            status: "error",
-          });
-        }
-      } else {
-        return res.status(400).send({
-          message: "please provide password and email",
-          status: "error",
-        });
-      }
-    } else {
-      return res.status(400).send({
-        message: "Verification code doesn't match",
-        status: "error",
-      });
-    }
-  } catch (error) {
-    return res.status(500).send({ error: error.message });
-  }
-};
-
 // /truck/addOrderToTruck/:truckId
 const addOrderToTruck = async (req, res) => {
   let truckId = req.params.truckId;
@@ -514,4 +444,5 @@ module.exports = {
   sendEmailForPasswordReset,
   truckDetails,
   addOrderToTruck,
+  truckDetails,
 };
