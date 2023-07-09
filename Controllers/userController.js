@@ -75,7 +75,7 @@ const signin = async (req, res) => {
         .status(400)
         .json({ message: "Password doesn't match", status: "error" });
     }
-    const payload = { id: existingUser._id, email: existingUser.email }
+    const payload = { id: existingUser._id, email: existingUser.email };
     const secretKey = SECRET_KEY;
 
     const token = jwt.sign(payload, secretKey);
@@ -86,11 +86,10 @@ const signin = async (req, res) => {
       status: "success",
       message: "Successfully login",
     });
-
   } catch (error) {
     return res
       .status(500)
-      .json({ message: "Internal server error", status: "success" });
+      .json({ message: "Internal server error", status: "error" });
   }
 };
 
@@ -334,7 +333,7 @@ const checkToken = (token) => {
     const decoded = jwt.verify(token, SECRET_KEY);
     return true;
   } catch (error) {
-    return false
+    return false;
   }
 };
 
@@ -361,7 +360,6 @@ const validate = async (req, res) => {
   }
 };
 
-
 module.exports = {
   signin,
   signup,
@@ -374,5 +372,5 @@ module.exports = {
   updateFavTrucksRemove,
   updateTruckRating,
   uploadProfileImgMogogDB,
-  validate
+  validate,
 };

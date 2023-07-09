@@ -12,6 +12,7 @@ const {
   passwordReset,
   sendEmailForPasswordReset,
   truckDetails,
+  addOrderToTruck,
 } = require("../Controllers/truckController");
 
 const truckRoute = express.Router();
@@ -27,6 +28,7 @@ truckRoute.patch("/addSchedule/:truckId", addSchedule);
 truckRoute.patch("/deleteSchedule/:truckId", deleteSchedule);
 truckRoute.patch("/addTruckMenu/:truckId", addTruckMenu);
 truckRoute.patch("/deleteTruckMenu/:truckId", deleteTruckMenu);
+truckRoute.put("/addOrderToTruck/:truckId", addOrderToTruck);
 
 truckRoute.put("/updateStripePaymentId/:truckId", updateStripePaymentId);
 

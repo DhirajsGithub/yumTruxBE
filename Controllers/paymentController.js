@@ -34,16 +34,20 @@ const createConnectAccountLink = async (req, res) => {
   const paymentId = req.body.paymentId;
   const returnUrl = req.body.returnUrl;
   const refreshUrl = req.body.refreshUrl;
-  try {
-    const accountLink = await stripe.accountLinks.create({
-      account: paymentId, // destination or let say truck owner destination
-      refresh_url: refreshUrl,
-      return_url: returnUrl,
-      type: "account_onboarding",
-    });
-    return res.send(accountLink);
-  } catch (error) {
-    return res.send(error);
+  if (paymentId?.length > 0) {
+    try {
+      const accountLink = await stripe.accountLinks.create({
+        account: paymentId, // destination or let say truck owner destination
+        refresh_url: refreshUrl,
+        return_url: returnUrl,
+        type: "account_onboarding",
+      });
+      return res.status(201).send(accountLink);
+    } catch (error) {
+      return res.status(500).send(error);
+    }
+  } else {
+    return res.status(400).send("paymentId is required");
   }
 };
 
@@ -64,7 +68,7 @@ const createPaymentSheet = async (req, res) => {
       automatic_payment_methods: {
         enabled: true,
       },
-      application_fee_amount: 123, // will be store as collection fee for each transaction
+      application_fee_amount: 0, // will be store as collection fee for each transaction
       transfer_data: {
         destination: paymentId, // destination
       },

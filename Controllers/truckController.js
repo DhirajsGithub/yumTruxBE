@@ -464,6 +464,42 @@ const passwordReset = async (req, res) => {
   }
 };
 
+// /truck/addOrderToTruck/:truckId
+const addOrderToTruck = async (req, res) => {
+  let truckId = req.params.truckId;
+  const order = req.body.order;
+  if (truckId?.length > 0) {
+    if (order) {
+      try {
+        const findTruck = await trucksModel
+          .findByIdAndUpdate({ _id: truckId }, { $push: { orders: order } })
+          .then((truck) => {
+            return res.status(201).send({
+              message: "Successfully added order to truck",
+              status: "success",
+            });
+          })
+          .catch((err) => {
+            return res.status(201).send({
+              message: "couldn't find the truck",
+              status: "error",
+            });
+          });
+      } catch (error) {
+        return res.status(500).send({ error: error.message });
+      }
+    } else {
+      return res
+        .status(400)
+        .send({ message: "required order", status: "error" });
+    }
+  } else {
+    return res
+      .status(400)
+      .send({ message: "required truck id", status: "error" });
+  }
+};
+
 module.exports = {
   signup,
   signin,
@@ -477,4 +513,5 @@ module.exports = {
   passwordReset,
   sendEmailForPasswordReset,
   truckDetails,
+  addOrderToTruck,
 };
