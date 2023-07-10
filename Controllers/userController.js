@@ -21,7 +21,7 @@ const signup = async (req, res) => {
     if (existingUser) {
       return res
         .status(400)
-        .json({ message: "User already exist", status: "error" });
+        .send({ message: "User already exist", status: "error" });
     }
 
     const hashPass = await bcrypt.hash(password, 8);
@@ -41,7 +41,7 @@ const signup = async (req, res) => {
     });
 
     const token = jwt.sign({ email: result.email, id: result._id }, SECRET_KEY);
-    return res.status(201).json({
+    return res.status(201).send({
       user: result,
       token,
       message: "Account created successfully",
@@ -50,7 +50,7 @@ const signup = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ message: "Internal server error", status: "error" });
+      .send({ message: "Internal server error", status: "error" });
   }
 };
 
@@ -66,21 +66,21 @@ const signin = async (req, res) => {
     if (!existingUser) {
       return res
         .status(404)
-        .json({ message: "User not found", status: "error" });
+        .send({ message: "User not found", status: "error" });
     }
 
     const matchPassword = await bcrypt.compare(password, existingUser.password);
     if (!matchPassword) {
       return res
         .status(400)
-        .json({ message: "Password doesn't match", status: "error" });
+        .send({ message: "Password doesn't match", status: "error" });
     }
     const payload = { id: existingUser._id, email: existingUser.email };
     const secretKey = SECRET_KEY;
 
     const token = jwt.sign(payload, secretKey);
 
-    return res.status(201).json({
+    return res.status(201).send({
       user: existingUser,
       token,
       status: "success",
@@ -89,7 +89,7 @@ const signin = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ message: "Internal server error", status: "error" });
+      .send({ message: "Internal server error", status: "error" });
   }
 };
 

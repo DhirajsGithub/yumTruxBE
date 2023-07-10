@@ -394,6 +394,82 @@ const updatePaypalEmail = async (req, res) => {
   }
 };
 
+// /sendEmailForPasswordReset
+const sendEmailForPasswordReset = async (req, res) => {
+  const email = req.body.email;
+  if (email?.length > 0) {
+    try {
+      const findTruck = await trucksModel.findOne({ email }).then((truck) => {
+        if (truck) {
+          const generatedOtp = otpGenerator.generate(5, {
+            upperCaseAlphabets: false,
+            specialChars: false,
+            lowerCaseAlphabets: false,
+          });
+          let info = PasswordResetMail(email, generatedOtp);
+          return res.status(200).send({
+            message: "Email sent successfully",
+            status: "success",
+            email,
+            generatedOtp,
+          });
+        } else {
+          return res
+            .status(400)
+            .send({ message: "Couldn't find the truck", status: "error" });
+        }
+      });
+    } catch (error) {
+      return res.status(500).send({ error: error.message });
+    }
+  } else {
+    return res.status(400).send({ message: "Require email", status: "error" });
+  }
+};
+
+// /passwordReset
+const passwordReset = async (req, res) => {
+  const generatedOtp = req.body.generatedOtp;
+  const email = req.body.email;
+  const inputOtp = req.body.inputOtp;
+  const newPassword = req.body.newPassword;
+  try {
+    if (inputOtp === generatedOtp) {
+      if (newPassword?.length > 0 && email?.length > 0) {
+        const hashPass = await bcrypt.hash(newPassword, 8);
+        let doc = await trucksModel.findOneAndUpdate(
+          { email },
+          { password: hashPass }
+        );
+
+        if (doc) {
+          return res.status(200).send({
+            message: "Password successfully updated",
+            status: "error",
+          });
+        } else {
+          return res.status(400).send({
+            message: "Couldn't find the truck",
+            status: "error",
+          });
+        }
+      } else {
+        return res.status(400).send({
+          message: "please provide password and email",
+          status: "error",
+        });
+      }
+    } else {
+      return res.status(400).send({
+        message: "Verification code doesn't match",
+        status: "error",
+      });
+    }
+  } catch (error) {
+    return res.status(500).send({ error: error.message });
+  }
+};
+
 // /truck/addOrderToTruck/:truckId
 const addOrderToTruck = async (req, res) => {
   let truckId = req.params.truckId;
@@ -444,5 +520,4 @@ module.exports = {
   sendEmailForPasswordReset,
   truckDetails,
   addOrderToTruck,
-  truckDetails,
 };
