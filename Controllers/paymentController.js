@@ -132,7 +132,13 @@ const generatePaypalAccessToken = async (req, res) => {
     token = await token.json();
     return res.status(200).send(token);
   } catch (error) {
-    console.log(error);
+    console.log(
+      "Basic " +
+        base64.encode(
+          process.env.PAYPAL_CLIENT_ID + ":" + process.env.PAYPAL_SECRET_KEY
+        )
+    );
+    console.log(JSON.stringify(error));
     return res.status(500).send(error);
   }
 };
