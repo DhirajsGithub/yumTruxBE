@@ -187,9 +187,9 @@ const generatePaypalSignupLink = async (req, res) => {
       body: body,
     });
     signUpData = await signUpData.json();
-    return res.send(signUpData);
+    return res.status(200).send(signUpData);
   } catch (error) {
-    return res.send(error);
+    return res.status(400).send(error);
   }
 };
 
