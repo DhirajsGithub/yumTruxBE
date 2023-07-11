@@ -1,4 +1,5 @@
 const connectToMongo = require("./database");
+
 connectToMongo();
 const express = require("express");
 const fileUpload = require("express-fileupload");
