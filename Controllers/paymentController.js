@@ -116,6 +116,12 @@ const generatePaypalAccessToken = async (req, res) => {
       ),
     "Content-Type": "application/x-www-form-urlencoded",
   };
+  console.log(
+    "Basic " +
+      base64.encode(
+        process.env.PAYPAL_CLIENT_ID + ":" + process.env.PAYPAL_SECRET_KEY
+      )
+  );
   const body = "grant_type=client_credentials";
   try {
     let token = await fetch(paypalUrl, {
@@ -126,6 +132,7 @@ const generatePaypalAccessToken = async (req, res) => {
     token = await token.json();
     return res.status(200).send(token);
   } catch (error) {
+    console.log(error);
     return res.status(500).send(error);
   }
 };
