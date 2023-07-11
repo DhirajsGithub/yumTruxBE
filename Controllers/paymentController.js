@@ -110,10 +110,12 @@ const generatePaypalAccessToken = async (req, res) => {
     //     `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_SECRET_KEY}`
     //   ).toString("base64"),
     Authorization:
-      "Basic " +
-      base64.encode(
-        process.env.PAYPAL_CLIENT_ID + ":" + process.env.PAYPAL_SECRET_KEY
-      ),
+      "Basic QWZ5U0oxbEtmdEpyZzZWcXloLUtidWpkS3lmRF8wRGdCcWRUTnN6dXNpNFQyU0Q0S1NORzJ5NTZvQjRVMzl2MnUxTHhwMFRNV0h5RzY4MUY6RUpCM2dERkpjbGo3OGVYdExZVUk4N0pWNi11dVoyOWdFTmtVWUdoT2NHQ2FlTlJSY1F0S3JzV3hXWW5lRlFtc3pqRlktWmFVVHpYaktYYzM=",
+    // Authorization:
+    //   "Basic " +
+    //   base64.encode(
+    //     process.env.PAYPAL_CLIENT_ID + ":" + process.env.PAYPAL_SECRET_KEY
+    //   ),
     "Content-Type": "application/x-www-form-urlencoded",
   };
   console.log(
