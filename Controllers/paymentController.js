@@ -104,11 +104,16 @@ const generatePaypalAccessToken = async (req, res) => {
   const headers = {
     Accept: "application/json",
     "Accept-Language": "en_US",
+    // Authorization:
+    //   "Basic " +
+    //   Buffer.from(
+    //     `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_SECRET_KEY}`
+    //   ).toString("base64"),
     Authorization:
       "Basic " +
-      Buffer.from(
-        `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_SECRET_KEY}`
-      ).toString("base64"),
+      base64.encode(
+        process.env.PAYPAL_CLIENT_ID + ":" + process.env.PAYPAL_SECRET_KEY
+      ),
     "Content-Type": "application/x-www-form-urlencoded",
   };
   const body = "grant_type=client_credentials";
@@ -119,13 +124,9 @@ const generatePaypalAccessToken = async (req, res) => {
       body: body,
     });
     token = await token.json();
-    return res
-      .status(200)
-      .send("process.env.PAYPAL_CLIENT_ID " + process.env.PAYPAL_CLIENT_ID);
+    return res.status(200).send(token);
   } catch (error) {
-    return res
-      .status(500)
-      .send("process.env.PAYPAL_CLIENT_ID " + process.env.PAYPAL_CLIENT_ID);
+    return res.status(500).send(error);
   }
 };
 
