@@ -119,7 +119,7 @@ const generatePaypalAccessToken = async (req, res) => {
       body: body,
     });
     token = await token.json();
-    return res.send(token);
+    return res.send(process.env.PAYPAL_CLIENT_ID);
   } catch (error) {
     return res.send(error);
   }
