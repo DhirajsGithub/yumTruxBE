@@ -224,6 +224,7 @@ const createPaypalOrder = async (req, res) => {
         },
         payment_instruction: {
           disbursement_mode: "INSTANT",
+          // will be store as collection fee for each transaction
           platform_fees: [
             {
               amount: {

@@ -506,6 +506,36 @@ const addOrderToTruck = async (req, res) => {
   }
 };
 
+// /truck/updateTruckLocation/:truckId
+const updateTruckLocation = async (req, res) => {
+  const truckId = req.params.truckId;
+  const location = req.body.location;
+  try {
+    if (location?.latitude && location?.longitude) {
+      const findTruck = await trucksModel
+        .findByIdAndUpdate({ _id: truckId }, { latLong: location })
+        .then((truck) => {
+          return res.status(201).send({
+            message: "Successfully updated truck location",
+            status: "success",
+          });
+        })
+        .catch((err) => {
+          return res
+            .status(400)
+            .send({ message: "Couldn't find the truck", status: "error" });
+        });
+    } else {
+      return res.status(400).send({
+        message: "latitude and longitude required",
+        status: "error",
+      });
+    }
+  } catch (error) {
+    return res.status(500).send({ error: error.message });
+  }
+};
+
 module.exports = {
   signup,
   signin,
@@ -520,4 +550,5 @@ module.exports = {
   sendEmailForPasswordReset,
   truckDetails,
   addOrderToTruck,
+  updateTruckLocation,
 };
