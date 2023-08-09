@@ -147,12 +147,14 @@ const truckDetails = async (req, res) => {
 const upateBasicData = async (req, res) => {
   const truckId = req.params.truckId;
   const name = req.body.name;
+  const address = req.body.address;
   const description = req.body.description;
   const imgUrl = req.body.imgUrl;
   const timing = req.body.timing;
   try {
     if (
       name?.length > 0 &&
+      address?.length > 0 &&
       description?.length > 0 &&
       imgUrl?.length > 0 &&
       timing?.length > 0
@@ -160,7 +162,7 @@ const upateBasicData = async (req, res) => {
       const findTruck = await trucksModel
         .findByIdAndUpdate(
           { _id: truckId },
-          { name, description, imgUrl, timing }
+          { name, address, description, imgUrl, timing }
         )
         .then((truck) => {
           return res.status(201).send({
@@ -312,7 +314,7 @@ const deleteTruckMenu = async (req, res) => {
         .findByIdAndUpdate({ _id: truckId }, { $pull: { menu: { id } } })
         .then((truck) => {
           return res.status(201).send({
-            message: "Successfully de§leted truck menu",
+            message: "Successfully deleted truck menu",
             status: "success",
           });
         })
@@ -536,6 +538,51 @@ const updateTruckLocation = async (req, res) => {
   }
 };
 
+const updateMenuItem = async (req, res) => {
+  const truckId = req.params.truckId; // Truck ID
+  const menuId = req.body.menuId; // Menu Item ID
+  const { name, price, description, imgUrl } = req.body; // Updated menu item data
+  console.log(menuId)
+  console.log(imgUrl)
+  try {
+    if (menuId) {
+      const updatedMenuItem = await trucksModel.findOneAndUpdate(
+        { _id: truckId, "menu.id": menuId }, // Find the truck by ID and the menu item by its ID
+        {
+          $set: {
+            "menu.$.name": name,
+            "menu.$.price": price,
+            "menu.$.description": description,
+            "menu.$.imgUrl": imgUrl,
+          },
+        },
+        { new: true }
+      );
+
+      if (updatedMenuItem) {
+        return res.status(200).send({
+          message: "Menu item updated successfully",
+          status: "success",
+          updatedMenuItem,
+        });
+      } else {
+        return res.status(404).send({
+          message: "Menu item not found or couldn't be updated",
+          status: "error",
+        });
+      }
+    } else {
+      return res.status(400).send({
+        message: "Menu item ID required",
+        status: "error",
+      });
+    }
+  } catch (error) {
+    return res.status(500).send({ error: error.message });
+  }
+};
+
+
 module.exports = {
   signup,
   signin,
@@ -551,4 +598,5 @@ module.exports = {
   truckDetails,
   addOrderToTruck,
   updateTruckLocation,
+  updateMenuItem
 };
