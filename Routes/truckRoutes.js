@@ -15,6 +15,7 @@ const {
   addOrderToTruck,
   updateTruckLocation,
   addTruck,
+  updateMenuItem,
 } = require("../Controllers/truckController");
 
 const truckRoute = express.Router();
@@ -33,6 +34,7 @@ truckRoute.patch("/addTruckMenu/:truckId", addTruckMenu);
 truckRoute.patch("/deleteTruckMenu/:truckId", deleteTruckMenu);
 truckRoute.put("/addOrderToTruck/:truckId", addOrderToTruck);
 truckRoute.put("/updateTruckLocation/:truckId", updateTruckLocation);
+truckRoute.put("/updateMenuItem/:truckId", updateMenuItem);
 
 truckRoute.put("/updateStripePaymentId/:truckId", updateStripePaymentId);
 
