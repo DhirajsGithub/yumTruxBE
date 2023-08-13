@@ -53,6 +53,9 @@ const TruckSchema = new Schema({
   orders: {
     type: Object,
   },
+  status: {
+    type: String,
+  },
 });
 
 module.exports = mongoose.model("truck", TruckSchema);

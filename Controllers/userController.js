@@ -213,7 +213,7 @@ const userDetails = async (req, res) => {
 const truckListDetail = async (req, res) => {
   try {
     const trucks = await trucksModel
-      .find({})
+      .find({ status: "active" })
       .then((trucks) => {
         let temp = [];
         for (let truck of trucks) {

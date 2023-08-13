@@ -1,18 +1,20 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const TruckSchema = new Schema({
+const TruckOwnerSchema = new Schema({
   name: {
-    type: String, // truck name
+    type: String,
   },
   username: {
     type: String,
+    unique: true,
   },
   password: {
     type: String,
   },
   email: {
     type: String,
+    unique: true,
   },
   phoneNo: {
     type: String,
@@ -26,6 +28,9 @@ const TruckSchema = new Schema({
   ownTrucks: {
     type: Object,
   },
+  passwordResetToken: {
+    type: String,
+  },
 });
 
-module.exports = mongoose.model("truck", TruckSchema);
+module.exports = mongoose.model("truckOwner", TruckOwnerSchema);

@@ -11,6 +11,7 @@ const userRoutes = require("./Routes/userRoutes");
 const truckRoutes = require("./Routes/truckRoutes");
 const generalRoutes = require("./Routes/genralRoute");
 const paymentRoutes = require("./Routes/paymentRoutes");
+const truckOwnerRoutes = require("./Routes/truckOwnerRoutes");
 
 // to use req.body as json we need to use middle ware
 app.use(
@@ -22,9 +23,10 @@ app.use(cors());
 
 app.use(express.json());
 app.use("/", userRoutes);
-app.use("/", generalRoutes);
+app.use("/generalRoutes", generalRoutes);
 app.use("/truck", truckRoutes);
 app.use("/payments", paymentRoutes);
+app.use("/truckOwner", truckOwnerRoutes);
 
 app.listen(port, () => {
   console.log(`YumTrux backend app listening at http://localhost:${port}`);

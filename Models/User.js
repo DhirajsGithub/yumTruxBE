@@ -36,6 +36,9 @@ const UserSchema = new Schema({
   address: {
     type: String,
   },
+  passwordResetToken: {
+    type: String,
+  },
 });
 
 module.exports = mongoose.model("user", UserSchema);

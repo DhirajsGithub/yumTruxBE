@@ -1,10 +1,13 @@
 // /truck/signup
 const trucksModel = require("../Models/Truck");
+const truckOwnerModel = require("../Models/TruckOwner");
+
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const uniqid = require("uniqid");
 const { sendMail } = require("../utils/SendMail");
 const SECRET_KEY = "yumtruxsecret69";
+const reqDate = new Date();
 
 // /truck/signup
 const signup = async (req, res) => {
@@ -120,7 +123,61 @@ const signin = async (req, res) => {
       .json({ message: "Internal server error", status: "success" });
   }
 };
-//truckDetails
+
+// /truck/addTruck  ---> only used to add a empty truck
+const addTruck = async (req, res) => {
+  const email = req.body.email;
+  const truckOwner = await truckOwnerModel.findOne({ email });
+  if (truckOwner) {
+    const truck = await trucksModel.create({
+      name: "",
+      username: truckOwner.username,
+      email: truckOwner.email,
+      phoneNo: truckOwner.phoneNo,
+      schedule: [],
+      latLong: [],
+      description: "",
+      imgUrl:
+        "https://assets.traveltriangle.com/blog/wp-content/uploads/2019/08/shutterstock_1095843908.jpg",
+      address: "",
+      timing: "",
+      ratings: [],
+      menu: [],
+      paymentId: "",
+      balance: "",
+      status: "active",
+    });
+    console.log(truck);
+    if (truck) {
+      const truckId = truck._id;
+      await truckOwnerModel.findByIdAndUpdate(
+        { _id: truckOwner._id },
+        {
+          $push: {
+            ownTrucks: { truckId: truckId, addedOn: reqDate, status: "active" },
+          },
+        }
+      );
+      return res.status(201).send({
+        message: "Truck added successfully",
+        status: "success",
+        truckId: truck._id,
+      });
+    } else {
+      return res.status(500).send({
+        message: "Internal server error",
+        status: "error",
+      });
+    }
+  } else {
+    return res.status(400).send({
+      message: "Couldn't find a truck owner with provided email",
+      status: "error",
+    });
+  }
+};
+
+//truckDetails    ---> retrive truck details
 const truckDetails = async (req, res) => {
   const userId = req.params.truckId;
   try {
@@ -143,24 +200,28 @@ const truckDetails = async (req, res) => {
   }
 };
 
-// /truck/upateBasicData/:truckId
+// /truck/upateBasicData/:truckId   ---> update truck name, description, imgUrl, timing, phoneNo, address
 const upateBasicData = async (req, res) => {
   const truckId = req.params.truckId;
   const name = req.body.name;
   const description = req.body.description;
   const imgUrl = req.body.imgUrl;
   const timing = req.body.timing;
+  const phoneNo = req.body.phoneNo;
+  const address = req.body.address;
   try {
     if (
       name?.length > 0 &&
       description?.length > 0 &&
       imgUrl?.length > 0 &&
-      timing?.length > 0
+      timing?.length > 0 &&
+      phoneNo?.length > 0 &&
+      address?.length > 0
     ) {
       const findTruck = await trucksModel
         .findByIdAndUpdate(
           { _id: truckId },
-          { name, description, imgUrl, timing }
+          { name, description, imgUrl, timing, phoneNo, address }
         )
         .then((truck) => {
           return res.status(201).send({
@@ -187,7 +248,7 @@ const upateBasicData = async (req, res) => {
   }
 };
 
-// /truck/addSchedule/:truckId
+// /truck/addSchedule/:truckId    ---> add truck schedule
 const addSchedule = async (req, res) => {
   const truckId = req.params.truckId;
   const dateObj = req.body ? req.body.schedule[0].dateObj : null;
@@ -226,7 +287,7 @@ const addSchedule = async (req, res) => {
   }
 };
 
-// /truck/deleteSchedule/:truckId/
+// /truck/deleteSchedule/:truckId/    ---> delete truck schedule
 const deleteSchedule = async (req, res) => {
   const truckId = req.params.truckId;
   const scheduleId = req.body.scheduleId;
@@ -334,7 +395,7 @@ const deleteTruckMenu = async (req, res) => {
   }
 };
 
-// /truck/updatePaymentId/:truckId
+// /truck/updatePaymentId/:truckId    // stripe payment id will be unique or different for each truck, it will be updated through truck id and not truckOwner id
 const updateStripePaymentId = async (req, res) => {
   const truckId = req.params.truckId;
   const paymentId = req.body.paymentId;
@@ -364,7 +425,7 @@ const updateStripePaymentId = async (req, res) => {
   }
 };
 
-// /truck/updatePaypalEmail/:truckId
+// /truck/updatePaypalEmail/:truckId    // paypal email will be unique or different for each truck, it will be updated through truck id and not truckOwner id
 const updatePaypalEmail = async (req, res) => {
   const truckId = req.params.truckId;
   const paypalEmail = req.body.paypalEmail;
@@ -394,83 +455,7 @@ const updatePaypalEmail = async (req, res) => {
   }
 };
 
-// /sendEmailForPasswordReset
-const sendEmailForPasswordReset = async (req, res) => {
-  const email = req.body.email;
-  if (email?.length > 0) {
-    try {
-      const findTruck = await trucksModel.findOne({ email }).then((truck) => {
-        if (truck) {
-          const generatedOtp = otpGenerator.generate(5, {
-            upperCaseAlphabets: false,
-            specialChars: false,
-            lowerCaseAlphabets: false,
-          });
-          let info = PasswordResetMail(email, generatedOtp);
-          return res.status(200).send({
-            message: "Email sent successfully",
-            status: "success",
-            email,
-            generatedOtp,
-          });
-        } else {
-          return res
-            .status(400)
-            .send({ message: "Couldn't find the truck", status: "error" });
-        }
-      });
-    } catch (error) {
-      return res.status(500).send({ error: error.message });
-    }
-  } else {
-    return res.status(400).send({ message: "Require email", status: "error" });
-  }
-};
-
-// /passwordReset
-const passwordReset = async (req, res) => {
-  const generatedOtp = req.body.generatedOtp;
-  const email = req.body.email;
-  const inputOtp = req.body.inputOtp;
-  const newPassword = req.body.newPassword;
-  try {
-    if (inputOtp === generatedOtp) {
-      if (newPassword?.length > 0 && email?.length > 0) {
-        const hashPass = await bcrypt.hash(newPassword, 8);
-        let doc = await trucksModel.findOneAndUpdate(
-          { email },
-          { password: hashPass }
-        );
-
-        if (doc) {
-          return res.status(200).send({
-            message: "Password successfully updated",
-            status: "error",
-          });
-        } else {
-          return res.status(400).send({
-            message: "Couldn't find the truck",
-            status: "error",
-          });
-        }
-      } else {
-        return res.status(400).send({
-          message: "please provide password and email",
-          status: "error",
-        });
-      }
-    } else {
-      return res.status(400).send({
-        message: "Verification code doesn't match",
-        status: "error",
-      });
-    }
-  } catch (error) {
-    return res.status(500).send({ error: error.message });
-  }
-};
-
-// /truck/addOrderToTruck/:truckId
+// /truck/addOrderToTruck/:truckId      // add order to truck it is used in app side when user place order
 const addOrderToTruck = async (req, res) => {
   let truckId = req.params.truckId;
   const order = req.body.order;
@@ -506,7 +491,7 @@ const addOrderToTruck = async (req, res) => {
   }
 };
 
-// /truck/updateTruckLocation/:truckId
+// /truck/updateTruckLocation/:truckId    // add trucks latitude and longitude, it should be called frequently as per trucks movement
 const updateTruckLocation = async (req, res) => {
   const truckId = req.params.truckId;
   const location = req.body.location;
@@ -546,9 +531,8 @@ module.exports = {
   deleteTruckMenu,
   updateStripePaymentId,
   updatePaypalEmail,
-  passwordReset,
-  sendEmailForPasswordReset,
   truckDetails,
   addOrderToTruck,
   updateTruckLocation,
+  addTruck,
 };
