@@ -16,7 +16,7 @@ const {
 const userRoute = express.Router();
 
 userRoute.get("/", (req, res) => {
-  return res.send("Welcome to YumTrux :) \nWe are here for your serving 3");
+  return res.send("Welcome to YumTrux :) \nWe are here for your serving <3");
 });
 
 userRoute.post("/signup", signup);

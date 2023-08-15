@@ -165,6 +165,15 @@ const generatePaypalSignupLink = async (req, res) => {
         granted: true,
       },
     ],
+    partner_config_override: {
+      partner_logo_url:
+        "https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg",
+      return_url: "https://stripe.com/docs/api/authentication",
+      return_url_description:
+        "the url to return the merchant after the paypal onboarding process.",
+      action_renewal_url: "https://testenterprises.com/renew-exprired-url",
+      show_add_credit_card: true,
+    },
   });
 
   try {
