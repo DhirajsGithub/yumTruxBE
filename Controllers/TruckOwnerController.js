@@ -10,13 +10,12 @@ const SECRET_KEY = "yumtruxsecret69";
 
 // /truckOwner/signup
 const signup = async (req, res) => {
-  const { email, username, password, phoneNo, address } = req.body;
+  const { email, username, password, phoneNo } = req.body;
   try {
     if (
       email?.length > 0 &&
       username?.length > 0 &&
       password?.length > 0 &&
-      address?.length > 0 &&
       phoneNo
     ) {
       const existingTruckOwner = await truckOwnerModel.findOne({
@@ -39,7 +38,7 @@ const signup = async (req, res) => {
         phoneNo,
         passwordResetToken: "",
         imgUrl: "",
-        address,
+        address: "",
         ownTrucks: [],
       });
 

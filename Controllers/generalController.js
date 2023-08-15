@@ -35,8 +35,6 @@ const sendEmailForPasswordReset = async (req, res) => {
           .findOneAndUpdate({ email }, { passwordResetToken: generatedOtp })
           .then((truck) => {
             if (truck) {
-              console.log(truck);
-
               let info = PasswordResetMail(email, generatedOtp);
               return res.status(200).send({
                 message: "Email sent successfully",
@@ -54,8 +52,6 @@ const sendEmailForPasswordReset = async (req, res) => {
           .findOneAndUpdate({ email }, { passwordResetToken: generatedOtp })
           .then((user) => {
             if (user) {
-              console.log(user);
-
               let info = PasswordResetMail(email, generatedOtp);
               return res.status(200).send({
                 message: "Email sent successfully",

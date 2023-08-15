@@ -148,6 +148,7 @@ const addTruck = async (req, res) => {
       status: "active",
     });
     console.log(truck);
+
     if (truck) {
       const truckId = truck._id;
       await truckOwnerModel.findByIdAndUpdate(
@@ -238,7 +239,7 @@ const upateBasicData = async (req, res) => {
         });
     } else {
       return res.status(201).send({
-        message: "required truck name, description, image url, timing",
+        message: "Please fill all missing fields!",
         status: "error",
       });
     }
@@ -529,6 +530,7 @@ const updateMenuItem = async (req, res) => {
   const { name, price, description, imgUrl } = req.body; // Updated menu item data
   console.log(menuId);
   console.log(imgUrl);
+
   try {
     if (menuId) {
       const updatedMenuItem = await trucksModel.findOneAndUpdate(

@@ -22,6 +22,9 @@ truckOwnerRoutes.patch("/deactivateTruck/:truckOwnerId", deactivateTruck);
 truckOwnerRoutes.patch("/activateTruck/:truckOwnerId", activateTruck);
 
 // /truckOwner/getTruckOwnerTrucks/:truckOwnerId
-truckOwnerRoutes.get("/getTruckOwnerTrucks/:truckOwnerId", getTruckOwnerTrucks);
+truckOwnerRoutes.post(
+  "/getTruckOwnerTrucks/:truckOwnerId",
+  getTruckOwnerTrucks
+);
 
 module.exports = truckOwnerRoutes;

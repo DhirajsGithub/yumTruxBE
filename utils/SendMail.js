@@ -11,9 +11,9 @@ const sendMail = async (email, username) => {
   });
 
   let info = await transporter.sendMail({
-    from: "borseganesh123@gmail.com",
+    from: "support@yumtrux.com",
     to: email,
-    subject: "Login Detected at YumTruks",
+    subject: "Login Detected at YumTrux",
     text: "Hello world",
     html: `<html
     xmlns="http://www.w3.org/1999/xhtml"
@@ -26,7 +26,7 @@ const sendMail = async (email, username) => {
       <meta name="x-apple-disable-message-reformatting" />
       <meta http-equiv="X-UA-Compatible" content="IE=edge" />
       <meta content="telephone=no" name="format-detection" />
-      <title>YumTruk</title>
+      <title>YumTrux</title>
       <link
         href="https://fonts.googleapis.com/css2?family=Imprima&display=swap"
         rel="stylesheet"
@@ -425,7 +425,7 @@ const sendMail = async (email, username) => {
                                           color: #2d3142;
                                         "
                                       >
-                                        Recent Login Detected on YumTruk Website
+                                        Recent Login Detected on YumTrux Website
                                       </h3>
                                       <h3
                                         style="
@@ -471,7 +471,7 @@ const sendMail = async (email, username) => {
                                         please disregard this message. However, if
                                         you did not initiate this login activity,
                                         we strongly advise you to&nbsp;Contact
-                                        YumTruk Support&nbsp;
+                                        YumTrux Support&nbsp;
                                       </p>
                                       <p
                                         style="
