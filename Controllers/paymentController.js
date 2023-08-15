@@ -261,6 +261,28 @@ const createPaypalOrder = async (req, res) => {
   }
 };
 
+// truck owener payment
+
+// /payments/
+const truckOwnerPayment = async (req, res) => {
+  const YOUR_DOMAIN =
+    "https://stripe.com/docs/checkout/quickstart?client=react";
+  const session = await stripe.checkout.sessions.create({
+    line_items: [
+      {
+        // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+        price: 1234,
+        quantity: 1,
+      },
+    ],
+    mode: "payment",
+    success_url: `${YOUR_DOMAIN}?success=true`,
+    cancel_url: `${YOUR_DOMAIN}?canceled=true`,
+  });
+
+  res.redirect(303, session.url);
+};
+
 module.exports = {
   createPaymentIntents,
   createConnectAccount,
@@ -271,4 +293,5 @@ module.exports = {
   generatePaypalSignupLink,
   createPaypalOrder,
   capturePaypalPayment,
+  truckOwnerPayment,
 };

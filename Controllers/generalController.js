@@ -109,6 +109,7 @@ const passwordReset = async (req, res) => {
                 return res.status(200).send({
                   message: "Password successfully updated",
                   status: "success",
+                  email,
                 });
               }
             } else {
@@ -146,6 +147,7 @@ const passwordReset = async (req, res) => {
                 return res.status(200).send({
                   message: "Password successfully updated",
                   status: "success",
+                  email,
                 });
               }
             } else {

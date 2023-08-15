@@ -9,6 +9,7 @@ const {
   generatePaypalSignupLink,
   createPaypalOrder,
   capturePaypalPayment,
+  truckOwnerPayment,
 } = require("../Controllers/paymentController");
 const router = express.Router();
 
@@ -35,5 +36,8 @@ router.post("/generatePaypalSignupLink", generatePaypalSignupLink);
 
 // user onboarding for paypal payment
 router.post("/createPaypalOrder", createPaypalOrder);
+
+// truck owner payment
+router.post("/truckOwnerPayment", truckOwnerPayment);
 
 module.exports = router;
