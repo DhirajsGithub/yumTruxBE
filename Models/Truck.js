@@ -56,6 +56,9 @@ const TruckSchema = new Schema({
   status: {
     type: String,
   },
+  stripePaymentDate: {
+    type: Date,
+  },
 });
 
 module.exports = mongoose.model("truck", TruckSchema);

@@ -272,7 +272,7 @@ const createPaypalOrder = async (req, res) => {
 
 // truck owener payment
 
-// /payments/
+// /payments/truckOwnerPayment
 const truckOwnerPayment = async (req, res) => {
   const YOUR_DOMAIN =
     "https://stripe.com/docs/checkout/quickstart?client=react";
@@ -280,7 +280,7 @@ const truckOwnerPayment = async (req, res) => {
     line_items: [
       {
         // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-        price: 1234,
+        price: "price_1NfhCMEGDgrKEqaAQ6kqm0xv",
         quantity: 1,
       },
     ],
@@ -288,9 +288,10 @@ const truckOwnerPayment = async (req, res) => {
     success_url: `${YOUR_DOMAIN}?success=true`,
     cancel_url: `${YOUR_DOMAIN}?canceled=true`,
   });
-
+  console.log(session);
   res.redirect(303, session.url);
 };
+// we added a product in stripe dashboard and then we created a price id for that product to put in truckOwnerPayment controller
 
 module.exports = {
   createPaymentIntents,
