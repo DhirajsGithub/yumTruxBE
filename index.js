@@ -28,33 +28,21 @@ app.use("/truck", truckRoutes);
 app.use("/payments", paymentRoutes);
 app.use("/truckOwner", truckOwnerRoutes);
 
-app.post(
-  "/stripe_webhooks",
-  express.json({ type: "application/json" }),
-  (request, response) => {
-    const event = request.body;
-    console.log(event);
-    // Handle the event
-    switch (event.type) {
-      case "payment_intent.succeeded":
-        const paymentIntent = event.data.object;
-        // Then define and call a method to handle the successful payment intent.
-        // handlePaymentIntentSucceeded(paymentIntent);
-        break;
-      case "payment_method.attached":
-        const paymentMethod = event.data.object;
-        // Then define and call a method to handle the successful attachment of a PaymentMethod.
-        // handlePaymentMethodAttached(paymentMethod);
-        break;
-      // ... handle other event types
-      default:
-        console.log(`Unhandled event type ${event.type}`);
-    }
+// This is your Stripe CLI webhook secret for testing your endpoint locally.
+app.post("/webhook", (req, res) => {
+  const event = req.body;
+  // Handle the specific event type
+  if (event.type === "payment_intent.succeeded") {
+    const paymentIntent = event.data.object;
+    const paymentStatus = paymentIntent.status;
 
-    // Return a response to acknowledge receipt of the event
-    response.json({ received: true });
+    // Update your database or perform other actions based on payment status
+    console.log("Payment succeeded. Status:", paymentStatus);
+    console.log("Payment succeeded. Intent:", paymentIntent);
   }
-);
+
+  res.status(200).end();
+});
 
 app.listen(port, () => {
   console.log(`YumTrux backend app listening at http://localhost:${port}`);
