@@ -13,6 +13,9 @@ const generalRoutes = require("./Routes/genralRoute");
 const paymentRoutes = require("./Routes/paymentRoutes");
 const truckOwnerRoutes = require("./Routes/truckOwnerRoutes");
 
+// for webhook
+const trucksModel = require("./Models/Truck");
+
 // to use req.body as json we need to use middle ware
 app.use(
   fileUpload({
@@ -28,19 +31,43 @@ app.use("/truck", truckRoutes);
 app.use("/payments", paymentRoutes);
 app.use("/truckOwner", truckOwnerRoutes);
 
-// This is your Stripe CLI webhook secret for testing your endpoint locally.
-app.post("/webhook", (req, res) => {
+app.post("/webhook", async (req, res) => {
   const event = req.body;
-  // Handle the specific event type
+
+  // Handle charge.succeeded event
+  if (event.type === "charge.succeeded") {
+    const charge = event.data.object;
+    const paymentIntentId = charge.payment_intent;
+  }
+  // Handle payment_intent.succeeded event
   if (event.type === "payment_intent.succeeded") {
     const paymentIntent = event.data.object;
-    const paymentStatus = paymentIntent.status;
-
-    // Update your database or perform other actions based on payment status
-    console.log("Payment succeeded. Status:", paymentStatus);
-    console.log("Payment succeeded. Intent:", paymentIntent);
   }
 
+  // Handle payment_intent.payment_failed event
+  if (event.type === "payment_intent.payment_failed") {
+    const paymentIntent = event.data.object;
+    // Handle failed payment intent
+  }
+
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+    const clientReferenceId = session.client_reference_id;
+    if (clientReferenceId) {
+      try {
+        await trucksModel.findByIdAndUpdate(clientReferenceId, {
+          stripePaymentDate: new Date(),
+        });
+        console.log("updated successfully");
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    console.log(
+      "Received checkout session event with client_reference_id:",
+      clientReferenceId
+    );
+  }
   res.status(200).end();
 });
 

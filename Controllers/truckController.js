@@ -146,6 +146,7 @@ const addTruck = async (req, res) => {
       paymentId: "",
       balance: "",
       status: "active",
+      stripePaymentDate: "",
     });
     console.log(truck);
 
