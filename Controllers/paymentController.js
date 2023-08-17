@@ -274,8 +274,7 @@ const createPaypalOrder = async (req, res) => {
 
 // /payments/truckOwnerPayment
 const truckOwnerPayment = async (req, res) => {
-  const truckId = "64dda7245a36ba451725f57a"; // Extract the userId from the request body
-
+  const truckId = req.body.truckId; // Extract the userId from the request body
   const YOUR_DOMAIN =
     "https://stripe.com/docs/checkout/quickstart?client=react";
   const session = await stripe.checkout.sessions.create({

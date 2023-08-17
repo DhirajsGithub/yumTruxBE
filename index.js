@@ -33,7 +33,7 @@ app.use("/truckOwner", truckOwnerRoutes);
 
 app.post("/webhook", async (req, res) => {
   const event = req.body;
-
+  
   // Handle charge.succeeded event
   if (event.type === "charge.succeeded") {
     const charge = event.data.object;
