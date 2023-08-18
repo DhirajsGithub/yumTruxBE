@@ -60,7 +60,9 @@ const signup = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log(error);
     return res
+
       .status(500)
       .json({ message: "Internal server error", status: "error" });
   }
@@ -208,6 +210,7 @@ const activateTruck = async (req, res) => {
 // /truckOwner/getAllTrucks/:truckOwnerId
 const getTruckOwnerTrucks = async (req, res) => {
   const truckOwnerId = req.params.truckOwnerId;
+
   const email = req.body.email;
   try {
     const truckOwner = truckOwnerModel

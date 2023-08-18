@@ -274,7 +274,9 @@ const createPaypalOrder = async (req, res) => {
 
 // /payments/truckOwnerPayment
 const truckOwnerPayment = async (req, res) => {
-  const truckId = req.body.truckId; // Extract the userId from the request body
+  const truckId = req.query.truckId; // Extract the truckId from the query parameters
+  console.log(truckId);
+
   const YOUR_DOMAIN =
     "https://stripe.com/docs/checkout/quickstart?client=react";
   const session = await stripe.checkout.sessions.create({
@@ -285,9 +287,9 @@ const truckOwnerPayment = async (req, res) => {
       },
     ],
     mode: "payment",
-    success_url: `${YOUR_DOMAIN}?success=true`,
-    cancel_url: `${YOUR_DOMAIN}?canceled=true`,
-    client_reference_id: truckId, // Attach the userId as client reference
+    success_url: `http://localhost:5173/truck-owner/pay?success=true`, // CHANGE TO yumtrux.com
+    cancel_url: `http://localhost:5173/truck-owner/pay?canceled=true`, // CHANGE TO yumtrux.com
+    client_reference_id: truckId,
   });
 
   res.redirect(303, session.url);
