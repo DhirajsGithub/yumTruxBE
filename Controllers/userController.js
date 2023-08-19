@@ -209,6 +209,15 @@ const userDetails = async (req, res) => {
   }
 };
 
+function addDays(date, days) {
+  date.setDate(date.getDate() + days);
+  return date;
+}
+
+const date = new Date("2022-05-15T00:00:00.000Z");
+
+const newDate = addDays(date, 5);
+
 // truckListDetail
 const truckListDetail = async (req, res) => {
   try {
@@ -224,7 +233,9 @@ const truckListDetail = async (req, res) => {
             truck.imgUrl.includes("http") &&
             truck.address.length > 0 &&
             truck.timing.length > 0 &&
-            truck.menu.length > 0
+            truck.menu.length > 0 &&
+            truck?.stripePaymentDate &&
+            addDays(new Date(truck?.stripePaymentDate), 30) > new Date()
           ) {
             temp.push(truck);
           }
