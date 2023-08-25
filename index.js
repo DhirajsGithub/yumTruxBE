@@ -12,6 +12,7 @@ const truckRoutes = require("./Routes/truckRoutes");
 const generalRoutes = require("./Routes/genralRoute");
 const paymentRoutes = require("./Routes/paymentRoutes");
 const truckOwnerRoutes = require("./Routes/truckOwnerRoutes");
+const adminRoutes = require("./Routes/adminRoute");
 
 // for webhook
 const trucksModel = require("./Models/Truck");
@@ -30,6 +31,7 @@ app.use("/generalRoutes", generalRoutes);
 app.use("/truck", truckRoutes);
 app.use("/payments", paymentRoutes);
 app.use("/truckOwner", truckOwnerRoutes);
+app.use("/admin", adminRoutes);
 
 app.post("/webhook", async (req, res) => {
   const event = req.body;

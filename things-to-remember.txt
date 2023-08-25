@@ -1,0 +1,6 @@
+- add a status for truckOwner to control the owner by admin, if status is inactive we won't show any of it's truck to the user
+- when new truck get added, we will send a notification to the admin to approve it
+- update truck owner details api should be added, updating it's name, profile img, address, phone no
+- add a new api of getting the categories of truck, also new categories will be added by admin
+- add a new field to menu, status. if status is inactive, we won't show it to the user
+- make sure user is block if it's status is inactive
