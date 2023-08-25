@@ -246,10 +246,60 @@ const getTruckOwnerTrucks = async (req, res) => {
   }
 };
 
+// /truckOwner/updateBasicInfo/:truckOwnerId
+const updateBasicInfo = async (req, res) => {
+  const { imgUrl, name, address, phoneNo } = req.body;
+  const truckOwnerId = req.params.truckOwnerId;
+  if (
+    imgUrl?.length > 0 &&
+    name?.length > 0 &&
+    address?.length > 0 &&
+    phoneNo?.length > 0
+  ) {
+    try {
+      const findTruckOwner = await truckOwnerModel
+        .findByIdAndUpdate(
+          { _id: truckOwnerId },
+          {
+            $set: {
+              imgUrl: imgUrl,
+              name: name,
+              address: address,
+              phoneNo: phoneNo,
+            },
+          }
+        )
+        .then((trukOwner) => {
+          return res.status(201).send({
+            message: "Successfully updated the truck owner",
+            status: "success",
+          });
+        })
+        .catch((error) => {
+          return res.status(400).send({
+            message: "Couldn't find the truck owner",
+            status: "error",
+          });
+        });
+    } catch (error) {
+      return res.status(500).send({
+        message: "Internal server error",
+        status: "error",
+      });
+    }
+  } else {
+    return res.status(400).send({
+      message: "imgUrl, name, address, phoneNo required",
+      status: "error",
+    });
+  }
+};
+
 module.exports = {
   signup,
   signin,
   deactivateTruck,
   activateTruck,
   getTruckOwnerTrucks,
+  updateBasicInfo,
 };

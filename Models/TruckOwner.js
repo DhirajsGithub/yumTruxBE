@@ -31,6 +31,9 @@ const TruckOwnerSchema = new Schema({
   passwordResetToken: {
     type: String,
   },
+  status: {
+    type: String,
+  },
 });
 
 module.exports = mongoose.model("truckOwner", TruckOwnerSchema);

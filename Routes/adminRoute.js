@@ -9,6 +9,7 @@ const {
   deleteCategory,
   getCategories,
   dashboardNumbers,
+  getTruckOwners,
 } = require("../Controllers/adminController");
 const adminRoutes = express.Router();
 const jwt = require("jsonwebtoken");
@@ -51,5 +52,8 @@ adminRoutes.get("/getCategories/", getCategories);
 
 // /admin/dashboardNumbers
 adminRoutes.get("/dashboardNumbers/", authenticateToken, dashboardNumbers);
+
+// /admin/getTruckOwners
+adminRoutes.get("/getTruckOwners/", authenticateToken, getTruckOwners);
 
 module.exports = adminRoutes;

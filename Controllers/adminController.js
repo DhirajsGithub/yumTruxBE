@@ -284,6 +284,19 @@ const dashboardNumbers = async (req, res) => {
     .json({ categoryCount, usersCount, trucksCount, truckOwnersCount });
 };
 
+// /admin/getTruckOwners
+const getTruckOwners = async (req, res) => {
+  const adminSecret = req.user.adminSecret;
+  if (adminSecret !== process.env.ADMIN_SECRET) {
+    return res.status(401).json({
+      message: "You are not authorized to access this route",
+      status: "error",
+    });
+  }
+  const truckOwners = await truckOwnerModel.find({});
+  return res.send(truckOwners);
+};
+
 module.exports = {
   signin,
   getUsers,
@@ -293,4 +306,5 @@ module.exports = {
   deleteCategory,
   getCategories,
   dashboardNumbers,
+  getTruckOwners,
 };

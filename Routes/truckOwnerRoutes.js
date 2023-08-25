@@ -5,6 +5,7 @@ const {
   deactivateTruck,
   activateTruck,
   getTruckOwnerTrucks,
+  updateBasicInfo,
 } = require("../Controllers/TruckOwnerController");
 
 const truckOwnerRoutes = express.Router();
@@ -26,5 +27,8 @@ truckOwnerRoutes.post(
   "/getTruckOwnerTrucks/:truckOwnerId",
   getTruckOwnerTrucks
 );
+
+// /truckOwner/updateBasicInfo/:truckOwnerId
+truckOwnerRoutes.put("/updateBasicInfo/:truckOwnerId", updateBasicInfo);
 
 module.exports = truckOwnerRoutes;
