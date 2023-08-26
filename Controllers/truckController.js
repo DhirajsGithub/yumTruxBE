@@ -131,6 +131,7 @@ const addTruck = async (req, res) => {
   if (truckOwner) {
     const truck = await trucksModel.create({
       name: "",
+      category: "",
       username: truckOwner.username,
       email: truckOwner.email,
       phoneNo: truckOwner.phoneNo,
@@ -211,6 +212,7 @@ const upateBasicData = async (req, res) => {
   const imgUrl = req.body.imgUrl;
   const timing = req.body.timing;
   const phoneNo = req.body.phoneNo;
+  const category = req.body.category;
 
   try {
     if (
@@ -220,12 +222,13 @@ const upateBasicData = async (req, res) => {
       imgUrl?.length > 0 &&
       timing?.length > 0 &&
       phoneNo?.length > 0 &&
-      address?.length > 0
+      address?.length > 0 &&
+      category?.length > 0
     ) {
       const findTruck = await trucksModel
         .findByIdAndUpdate(
           { _id: truckId },
-          { name, description, imgUrl, timing, phoneNo, address }
+          { name, description, imgUrl, timing, phoneNo, address, category }
         )
         .then((truck) => {
           return res.status(201).send({

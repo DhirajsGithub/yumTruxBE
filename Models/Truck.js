@@ -5,6 +5,9 @@ const TruckSchema = new Schema({
   name: {
     type: String, // truck name
   },
+  category: {
+    type: String,
+  },
   username: {
     type: String,
   },

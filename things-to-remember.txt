@@ -4,3 +4,4 @@
 - add a new api of getting the categories of truck, also new categories will be added by admin
 - add a new field to menu, status. if status is inactive, we won't show it to the user
 - make sure user is block if it's status is inactive
+- truck creatation date should be added

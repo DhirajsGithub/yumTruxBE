@@ -40,6 +40,7 @@ const signup = async (req, res) => {
         imgUrl: "",
         address: "",
         ownTrucks: [],
+        joinOn: new Date(),
       });
 
       const token = jwt.sign(

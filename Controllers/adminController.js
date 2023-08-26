@@ -297,6 +297,23 @@ const getTruckOwners = async (req, res) => {
   return res.send(truckOwners);
 };
 
+// /admin/getTruckList
+const getTruckList = async (req, res) => {
+  const adminSecret = req.user.adminSecret;
+  if (adminSecret !== process.env.ADMIN_SECRET) {
+    return res.status(401).json({
+      message: "You are not authorized to access this route",
+      status: "error",
+    });
+  }
+  const trucks = await trucksModel.find({});
+  const sortTrucks = trucks.sort((a, b) => {
+    return b.ratings?.length - a.ratings?.length;
+  });
+
+  return res.send(sortTrucks);
+};
+
 module.exports = {
   signin,
   getUsers,
@@ -307,4 +324,5 @@ module.exports = {
   getCategories,
   dashboardNumbers,
   getTruckOwners,
+  getTruckList,
 };
