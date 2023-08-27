@@ -375,7 +375,7 @@ const deleteTruckMenu = async (req, res) => {
   const truckId = req.params.truckId;
   const id = req.body.menuId;
   try {
-    if (id?.length > 0) {
+    if (id) {
       const findTruck = await trucksModel
         .findByIdAndUpdate({ _id: truckId }, { $pull: { menu: { id } } })
         .then((truck) => {
