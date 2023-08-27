@@ -209,26 +209,37 @@ const upateBasicData = async (req, res) => {
   const name = req.body.name;
   const address = req.body.address;
   const description = req.body.description;
-  const imgUrl = req.body.imgUrl;
   const timing = req.body.timing;
   const phoneNo = req.body.phoneNo;
   const category = req.body.category;
+
+  // Only update imgUrl if it's available in the request body
+  const updateData = {
+    name,
+    description,
+    timing,
+    phoneNo,
+    address,
+    category,
+  };
+
+  if (req.body.imgUrl) {
+    updateData.imgUrl = req.body.imgUrl;
+  }
 
   try {
     if (
       name?.length > 0 &&
       address?.length > 0 &&
       description?.length > 0 &&
-      imgUrl?.length > 0 &&
       timing?.length > 0 &&
       phoneNo?.length > 0 &&
-      address?.length > 0 &&
       category?.length > 0
     ) {
       const findTruck = await trucksModel
         .findByIdAndUpdate(
           { _id: truckId },
-          { name, description, imgUrl, timing, phoneNo, address, category }
+          updateData // Use the prepared updateData object
         )
         .then((truck) => {
           return res.status(201).send({
@@ -333,9 +344,10 @@ const deleteSchedule = async (req, res) => {
 const addTruckMenu = async (req, res) => {
   const truckId = req.params.truckId;
   const name = req.body.name;
-  const price = req.body.price;
+  const price = parseInt(req.body.price);
   const description = req.body.description;
   const imgUrl = req.body.imgUrl;
+
   const id = uniqid();
 
   try {
