@@ -208,6 +208,14 @@ const activateTruck = async (req, res) => {
   }
 };
 
+const findRating = (ratingLi) => {
+  if (ratingLi?.length > 0) {
+    const sum = ratingLi.reduce((a, b) => a + b, 0);
+    return Math.round(sum / ratingLi.length);
+  }
+  return 0;
+};
+
 // /truckOwner/getAllTrucks/:truckOwnerId
 const getTruckOwnerTrucks = async (req, res) => {
   const truckOwnerId = req.params.truckOwnerId;
@@ -220,16 +228,25 @@ const getTruckOwnerTrucks = async (req, res) => {
         const trucks = await trucksModel
           .find({ email: email })
           .then((trucks) => {
+            let updatedTruck = [];
+            trucks?.forEach((truck) => {
+              updatedTruck.push({
+                ...truck._doc,
+                avgRating: findRating(truck.ratings),
+              });
+            });
             if (trucks?.length === 0) {
               return res.status(201).send({
-                trucks: trucks,
+                trucks: updatedTruck,
                 message: "please check email or add truck",
                 status: "success",
               });
             }
-            return res
-              .status(201)
-              .send({ trucks: trucks, message: "success", status: "success" });
+            return res.status(201).send({
+              trucks: updatedTruck,
+              message: "success",
+              status: "success",
+            });
           })
           .catch((err) => {
             return res

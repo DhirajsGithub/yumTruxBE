@@ -57,9 +57,21 @@ app.post("/webhook", async (req, res) => {
     const clientReferenceId = session.client_reference_id;
     if (clientReferenceId) {
       try {
-        await trucksModel.findByIdAndUpdate(clientReferenceId, {
-          stripePaymentDate: new Date(),
-        });
+        let p = await trucksModel.findByIdAndUpdate(
+          { _id: clientReferenceId },
+
+          {
+            $set: { stripePaymentDate: new Date() },
+            $push: {
+              RechargeDetail: {
+                amount: session.amount_total,
+                date: new Date(),
+              },
+            },
+          },
+          { upsert: true }
+        );
+        console.log(p);
         console.log("updated successfully");
       } catch (error) {
         console.log(error);

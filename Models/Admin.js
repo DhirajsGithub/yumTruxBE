@@ -17,6 +17,9 @@ const AdminSchems = new Schema({
   categories: {
     type: Object,
   },
+  paymentId: {
+    type: String,
+  },
 });
 
 module.exports = mongoose.model("admin", AdminSchems);

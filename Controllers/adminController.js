@@ -297,6 +297,14 @@ const getTruckOwners = async (req, res) => {
   return res.send(truckOwners);
 };
 
+const findRating = (ratingLi) => {
+  if (ratingLi?.length > 0) {
+    const sum = ratingLi.reduce((a, b) => a + b, 0);
+    return Math.round(sum / ratingLi.length);
+  }
+  return 0;
+};
+
 // /admin/getTruckList
 const getTruckList = async (req, res) => {
   const adminSecret = req.user.adminSecret;
@@ -307,11 +315,85 @@ const getTruckList = async (req, res) => {
     });
   }
   const trucks = await trucksModel.find({});
-  const sortTrucks = trucks.sort((a, b) => {
-    return b.ratings?.length - a.ratings?.length;
+  let updatedTruck = [];
+  trucks?.forEach((truck) => {
+    updatedTruck.push({
+      ...truck._doc,
+      avgRating: findRating(truck.ratings),
+    });
   });
 
-  return res.send(sortTrucks);
+  return res.send(updatedTruck);
+};
+
+// /admin/deactivateTruck
+const deactivateTruck = async (req, res) => {
+  const truckId = req.body.truckId;
+
+  const adminSecret = req.user.adminSecret;
+  if (adminSecret !== process.env.ADMIN_SECRET) {
+    return res.status(401).json({
+      message: "You are not authorized to access this route",
+      status: "error",
+    });
+  }
+  try {
+    const findTruck = await trucksModel
+      .findByIdAndUpdate({ _id: truckId }, { $set: { status: "inactive" } })
+      .then((truck) => {
+        // send mail as well push notification accept mail and push notification token from body
+        return res.status(201).send({
+          message: "Successfully deactivate the truck",
+          status: "success",
+        });
+      })
+      .catch((err) => {
+        return res.status(400).send({
+          message: "Couldn't find the truck",
+          status: "error",
+        });
+      });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Internal server error",
+      status: "error",
+    });
+  }
+};
+
+// /admin/activateTruck
+const activateTruck = async (req, res) => {
+  const truckId = req.body.truckId;
+
+  const adminSecret = req.user.adminSecret;
+  if (adminSecret !== process.env.ADMIN_SECRET) {
+    return res.status(401).json({
+      message: "You are not authorized to access this route",
+      status: "error",
+    });
+  }
+  try {
+    const findTruck = await trucksModel
+      .findByIdAndUpdate({ _id: truckId }, { $set: { status: "active" } })
+      .then((truck) => {
+        // send mail as well push notification accept mail and push notification token from body
+        return res.status(201).send({
+          message: "Successfully activate the truck",
+          status: "success",
+        });
+      })
+      .catch((err) => {
+        return res.status(400).send({
+          message: "Couldn't find the truck",
+          status: "error",
+        });
+      });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Internal server error",
+      status: "error",
+    });
+  }
 };
 
 module.exports = {
@@ -325,4 +407,6 @@ module.exports = {
   dashboardNumbers,
   getTruckOwners,
   getTruckList,
+  deactivateTruck,
+  activateTruck,
 };

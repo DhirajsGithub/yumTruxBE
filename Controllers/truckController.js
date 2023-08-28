@@ -148,6 +148,8 @@ const addTruck = async (req, res) => {
       balance: "",
       status: "active",
       stripePaymentDate: null,
+      RechargeDetail: [],
+      addedOn: new Date(),
     });
     console.log(truck);
 
@@ -374,6 +376,7 @@ const addTruckMenu = async (req, res) => {
 const deleteTruckMenu = async (req, res) => {
   const truckId = req.params.truckId;
   const id = req.body.menuId;
+  console.log(String(id).length);
   try {
     if (id?.length > 0) {
       const findTruck = await trucksModel

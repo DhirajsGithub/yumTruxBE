@@ -5,3 +5,4 @@
 - add a new field to menu, status. if status is inactive, we won't show it to the user
 - make sure user is block if it's status is inactive
 - truck creatation date should be added
+- send mail and push notification to truck owner once his truck get active/dactive or when his order get deleted

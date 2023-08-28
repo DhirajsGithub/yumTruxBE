@@ -62,6 +62,12 @@ const TruckSchema = new Schema({
   stripePaymentDate: {
     type: Date,
   },
+  RechargeDetail: {
+    type: Object,
+  },
+  addedOn: {
+    type: Date,
+  },
 });
 
 module.exports = mongoose.model("truck", TruckSchema);

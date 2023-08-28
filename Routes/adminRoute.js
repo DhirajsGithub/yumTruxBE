@@ -11,6 +11,8 @@ const {
   dashboardNumbers,
   getTruckOwners,
   getTruckList,
+  deactivateTruck,
+  activateTruck,
 } = require("../Controllers/adminController");
 const adminRoutes = express.Router();
 const jwt = require("jsonwebtoken");
@@ -59,5 +61,11 @@ adminRoutes.get("/getTruckOwners/", authenticateToken, getTruckOwners);
 
 // /admin/getTruckList
 adminRoutes.get("/getTruckList/", authenticateToken, getTruckList);
+
+// /admin/deactivateTruck/
+adminRoutes.put("/deactivateTruck/", authenticateToken, deactivateTruck);
+
+// /admin/activateTruck/
+adminRoutes.put("/activateTruck/", authenticateToken, activateTruck);
 
 module.exports = adminRoutes;
