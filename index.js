@@ -4,6 +4,7 @@ connectToMongo();
 const express = require("express");
 const fileUpload = require("express-fileupload");
 const cors = require("cors");
+const uniqid = require("uniqid");
 
 const app = express();
 const port = process.env.PORT || 8000;
@@ -66,6 +67,7 @@ app.post("/webhook", async (req, res) => {
               RechargeDetail: {
                 amount: session.amount_total,
                 date: new Date(),
+                id: uniqid(),
               },
             },
           },
