@@ -10,6 +10,7 @@ const mongoose = require("mongoose");
 const { ObjectId } = require("mongodb");
 
 const uniqid = require("uniqid");
+const { ActionMail } = require("../utils/AdminMail");
 
 const SECRET_KEY = "yumtruxsecret69";
 
@@ -42,7 +43,7 @@ const signin = async (req, res) => {
           adminId: existingAdmin._id,
         },
         SECRET_KEY,
-        { expiresIn: "1d" }
+        { expiresIn: "2d" }
       );
       sendMail(existingAdmin.email, existingAdmin.name);
       return res.status(201).json({
@@ -329,7 +330,7 @@ const getTruckList = async (req, res) => {
 // /admin/deactivateTruck
 const deactivateTruck = async (req, res) => {
   const truckId = req.body.truckId;
-
+  const reason = req.body.reason;
   const adminSecret = req.user.adminSecret;
   if (adminSecret !== process.env.ADMIN_SECRET) {
     return res.status(401).json({
@@ -339,9 +340,26 @@ const deactivateTruck = async (req, res) => {
   }
   try {
     const findTruck = await trucksModel
-      .findByIdAndUpdate({ _id: truckId }, { $set: { status: "inactive" } })
+      .findByIdAndUpdate(
+        { _id: truckId },
+        { $set: { adminStatus: "inactive" } }
+      )
       .then((truck) => {
         // send mail as well push notification accept mail and push notification token from body
+        if (truck?.email) {
+          ActionMail(
+            truck.email,
+            "YumTrux Truck Status Updated by the admin",
+            `Your truck "${truck.name}" has been <strong style="color: #ef5350">Deactivated</strong> by the yumtrux admin.`,
+            reason,
+            {
+              link1:
+                "https://www.google.com/search?sca_esv=561067008&rlz=1C5CHFA_enIN977IN977&sxsrf=AB5stBh5C3K2Jox5gEY7QmxdqeMbv5tVuQ:1693335084372&q=food+truck&tbm=isch&source=lnms&sa=X&ved=2ahUKEwjI9cHhxIKBAxVrS2wGHVpEAGcQ0pQJegQICxAB&biw=1440&bih=783&dpr=2#imgrc=vmQ6Qy833491nM",
+              link2:
+                "https://www.google.com/search?sca_esv=561067008&rlz=1C5CHFA_enIN977IN977&sxsrf=AB5stBh5C3K2Jox5gEY7QmxdqeMbv5tVuQ:1693335084372&q=food+truck&tbm=isch&source=lnms&sa=X&ved=2ahUKEwjI9cHhxIKBAxVrS2wGHVpEAGcQ0pQJegQICxAB&biw=1440&bih=783&dpr=2#imgrc=7nmFwd-wgzg2MM",
+            }
+          );
+        }
         return res.status(201).send({
           message: "Successfully deactivate the truck",
           status: "success",
@@ -364,7 +382,7 @@ const deactivateTruck = async (req, res) => {
 // /admin/activateTruck
 const activateTruck = async (req, res) => {
   const truckId = req.body.truckId;
-
+  const reason = req.body.reason;
   const adminSecret = req.user.adminSecret;
   if (adminSecret !== process.env.ADMIN_SECRET) {
     return res.status(401).json({
@@ -374,9 +392,23 @@ const activateTruck = async (req, res) => {
   }
   try {
     const findTruck = await trucksModel
-      .findByIdAndUpdate({ _id: truckId }, { $set: { status: "active" } })
+      .findByIdAndUpdate({ _id: truckId }, { $set: { adminStatus: "active" } })
       .then((truck) => {
         // send mail as well push notification accept mail and push notification token from body
+        if (truck?.email) {
+          ActionMail(
+            truck.email,
+            "YumTrux Truck Status Updated by the admin",
+            `Your truck "${truck.name}" has been <strong style="color:#4caf50">Activated</strong> by the yumtrux admin.`,
+            reason,
+            {
+              link1:
+                "https://www.google.com/search?sca_esv=561067008&rlz=1C5CHFA_enIN977IN977&sxsrf=AB5stBh5C3K2Jox5gEY7QmxdqeMbv5tVuQ:1693335084372&q=food+truck&tbm=isch&source=lnms&sa=X&ved=2ahUKEwjI9cHhxIKBAxVrS2wGHVpEAGcQ0pQJegQICxAB&biw=1440&bih=783&dpr=2#imgrc=vmQ6Qy833491nM",
+              link2:
+                "https://www.google.com/search?sca_esv=561067008&rlz=1C5CHFA_enIN977IN977&sxsrf=AB5stBh5C3K2Jox5gEY7QmxdqeMbv5tVuQ:1693335084372&q=food+truck&tbm=isch&source=lnms&sa=X&ved=2ahUKEwjI9cHhxIKBAxVrS2wGHVpEAGcQ0pQJegQICxAB&biw=1440&bih=783&dpr=2#imgrc=7nmFwd-wgzg2MM",
+            }
+          );
+        }
         return res.status(201).send({
           message: "Successfully activate the truck",
           status: "success",
@@ -396,6 +428,22 @@ const activateTruck = async (req, res) => {
   }
 };
 
+// /admin/MonthlyPriceData
+const MonthlyPriceData = async (req, res) => {
+  const adminSecret = req.user.adminSecret;
+  if (adminSecret !== process.env.ADMIN_SECRET) {
+    return res.status(401).json({
+      message: "You are not authorized to access this route",
+      status: "error",
+    });
+  }
+  let data = await adminModel.find({}).select("MonthlyPriceData");
+  return res.status(200).json({
+    data: data[0]?.MonthlyPriceData ? data[0]?.MonthlyPriceData : [],
+    status: "success",
+  });
+};
+
 module.exports = {
   signin,
   getUsers,
@@ -409,4 +457,5 @@ module.exports = {
   getTruckList,
   deactivateTruck,
   activateTruck,
+  MonthlyPriceData,
 };

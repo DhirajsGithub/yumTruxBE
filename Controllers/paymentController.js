@@ -1,8 +1,9 @@
 require("dotenv").config();
 const fetch = require("node-fetch");
 const base64 = require("base-64");
-
+const adminModel = require("../Models/Admin");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const uniqid = require("uniqid");
 
 const createPaymentIntents = async (req, res) => {
   try {
@@ -274,27 +275,107 @@ const createPaypalOrder = async (req, res) => {
 
 // /payments/truckOwnerPayment
 const truckOwnerPayment = async (req, res) => {
-  const truckId = req.body.truckId; // Extract the truckId from the query parameters
+  const truckId = "64ee244daa0c8d5f1e2f180d"; // Extract the truckId from the query parameters
   console.log(truckId);
+  try {
+    let priceIds = await adminModel.find({}).select("MonthlyPriceData");
+    priceIds = priceIds[0]?.MonthlyPriceData;
+    if (priceIds?.length > 0) {
+      const priceId = priceIds[priceIds?.length - 1]?.priceId;
+      const YOUR_DOMAIN =
+        "https://stripe.com/docs/checkout/quickstart?client=react";
+      const session = await stripe.checkout.sessions.create({
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        mode: "payment",
+        success_url: `http://localhost:5173/truck-owner/pay?success=true`, // CHANGE TO yumtrux.com
+        cancel_url: `http://localhost:5173/truck-owner/pay?canceled=true`, // CHANGE TO yumtrux.com
+        client_reference_id: truckId,
+      });
 
-  const YOUR_DOMAIN =
-    "https://stripe.com/docs/checkout/quickstart?client=react";
-  const session = await stripe.checkout.sessions.create({
-    line_items: [
-      {
-        price: "price_1NfhCMEGDgrKEqaAQ6kqm0xv",
-        quantity: 1,
-      },
-    ],
-    mode: "payment",
-    success_url: `http://localhost:5173/truck-owner/pay?success=true`, // CHANGE TO yumtrux.com
-    cancel_url: `http://localhost:5173/truck-owner/pay?canceled=true`, // CHANGE TO yumtrux.com
-    client_reference_id: truckId,
-  });
-
-  res.redirect(303, session.url);
+      res.redirect(303, session.url);
+    } else {
+      return res.status(500).json({
+        message: "No priceIds found contact admin",
+        status: "error",
+      });
+    }
+  } catch (error) {
+    return res.status(400).json({});
+  }
 };
 // we added a product in stripe dashboard and then we created a price id for that product to put in truckOwnerPayment controller
+
+// yumtrux monthly payment handle by admin
+const createNewProduct = async (req, res) => {
+  const adminSecret = req.user.adminSecret;
+  const id = uniqid();
+  const { name, imageUrl, description, price } = req.body;
+  const adminId = req.user.adminId;
+
+  if (adminSecret !== process.env.ADMIN_SECRET) {
+    return res.status(401).json({
+      message: "You are not authorized to access this route",
+      status: "error",
+    });
+  }
+  try {
+    const product = await stripe.products.create({
+      name: name,
+      images: [imageUrl],
+      description: description,
+      default_price_data: {
+        unit_amount: price, // make sure to convert the price in cents
+        currency: "usd",
+      },
+      expand: ["default_price"],
+    });
+    try {
+      const findAdmin = await adminModel
+        .findByIdAndUpdate(
+          { _id: adminId },
+          {
+            $push: {
+              MonthlyPriceData: {
+                name: product.name,
+                description: product.description,
+                imgUrl: product.images[0],
+                addedOn: new Date(),
+                price: product.default_price.unit_amount,
+                productId: product.id,
+                priceId: product.default_price.id,
+                currency: product.default_price.currency,
+                type: product.default_price.type,
+              },
+            },
+          }
+        )
+        .then((admin) => {
+          return res.status(201).send({
+            message: "Successfully updated the MonthlyPriceData",
+            status: "success",
+          });
+        })
+        .catch((err) => {
+          return res.status(400).send({
+            message: "Couldn't find the admin",
+            status: "error",
+          });
+        });
+    } catch (error) {
+      return res.status(500).send({
+        message: "Internal server error",
+        status: "error",
+      });
+    }
+  } catch (error) {
+    return res.status(500).send({ message: error.message, status: "error" });
+  }
+};
 
 module.exports = {
   createPaymentIntents,
@@ -307,4 +388,5 @@ module.exports = {
   createPaypalOrder,
   capturePaypalPayment,
   truckOwnerPayment,
+  createNewProduct,
 };

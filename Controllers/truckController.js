@@ -145,11 +145,12 @@ const addTruck = async (req, res) => {
       ratings: [],
       menu: [],
       paymentId: "",
-      balance: "",
+      paypalEmail: "",
       status: "active",
       stripePaymentDate: null,
       RechargeDetail: [],
       addedOn: new Date(),
+      adminStatus: "active",
     });
     console.log(truck);
 

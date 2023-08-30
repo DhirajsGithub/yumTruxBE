@@ -11,9 +11,6 @@ const TruckSchema = new Schema({
   username: {
     type: String,
   },
-  password: {
-    type: String,
-  },
   email: {
     type: String,
   },
@@ -47,9 +44,6 @@ const TruckSchema = new Schema({
   paymentId: {
     type: String,
   },
-  balance: {
-    type: String,
-  },
   paypalEmail: {
     type: String,
   },
@@ -67,6 +61,9 @@ const TruckSchema = new Schema({
   },
   addedOn: {
     type: Date,
+  },
+  adminStatus: {
+    type: String,
   },
 });
 

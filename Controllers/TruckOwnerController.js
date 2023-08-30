@@ -36,10 +36,11 @@ const signup = async (req, res) => {
         password: hashPass,
         email,
         phoneNo,
-        passwordResetToken: "",
-        imgUrl: "",
+        imgUrl:
+          "https://img.freepik.com/premium-vector/account-icon-user-icon-vector-graphics_292645-552.jpg",
         address: "",
         ownTrucks: [],
+        passwordResetToken: "",
         joinOn: new Date(),
       });
 

@@ -13,6 +13,7 @@ const {
   getTruckList,
   deactivateTruck,
   activateTruck,
+  MonthlyPriceData,
 } = require("../Controllers/adminController");
 const adminRoutes = express.Router();
 const jwt = require("jsonwebtoken");
@@ -67,5 +68,8 @@ adminRoutes.put("/deactivateTruck/", authenticateToken, deactivateTruck);
 
 // /admin/activateTruck/
 adminRoutes.put("/activateTruck/", authenticateToken, activateTruck);
+
+// /admin/activateTruck/
+adminRoutes.get("/MonthlyPriceData/", authenticateToken, MonthlyPriceData);
 
 module.exports = adminRoutes;

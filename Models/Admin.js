@@ -20,6 +20,12 @@ const AdminSchems = new Schema({
   paymentId: {
     type: String,
   },
+  payments: {
+    type: Object,
+  },
+  MonthlyPriceData: {
+    type: Object,
+  },
 });
 
 module.exports = mongoose.model("admin", AdminSchems);

@@ -35,9 +35,11 @@ const signup = async (req, res) => {
       favouriteTrucks: [],
       orderHistory: [],
       profileImg:
-        "https://res.cloudinary.com/dk8hyxr2z/image/upload/v1685710777/yumtrux_users/defaultProfileImg_rrndub.webp",
+        "https://img.freepik.com/premium-vector/account-icon-user-icon-vector-graphics_292645-552.jpg",
       phoneNo: "",
       address: "",
+      passwordResetToken: "",
+      status: "active",
     });
 
     const token = jwt.sign({ email: result.email, id: result._id }, SECRET_KEY);
@@ -63,6 +65,12 @@ const signin = async (req, res) => {
     const existingUser = await userModel.findOne({
       email: email,
     });
+    if (existingUser.status === "inactive") {
+      return res.status(400).send({
+        message: "Your account is not active, please contact admin",
+        status: "error",
+      });
+    }
     if (!existingUser) {
       return res
         .status(404)
@@ -235,7 +243,8 @@ const truckListDetail = async (req, res) => {
             truck.timing.length > 0 &&
             truck.menu.length > 0 &&
             truck?.stripePaymentDate &&
-            addDays(new Date(truck?.stripePaymentDate), 30) > new Date()
+            addDays(new Date(truck?.stripePaymentDate), 30) > new Date() &&
+            truck.adminStatus === "active"
           ) {
             temp.push(truck);
           }

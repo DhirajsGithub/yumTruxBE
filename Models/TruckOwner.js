@@ -31,9 +31,9 @@ const TruckOwnerSchema = new Schema({
   passwordResetToken: {
     type: String,
   },
-  status: {
-    type: String,
-  },
+  // status: {
+  //   type: String,
+  // },
   joinOn: {
     type: Date,
   },

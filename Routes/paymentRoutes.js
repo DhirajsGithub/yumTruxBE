@@ -10,9 +10,11 @@ const {
   createPaypalOrder,
   capturePaypalPayment,
   truckOwnerPayment,
+  createNewProduct,
 } = require("../Controllers/paymentController");
 const router = express.Router();
-
+const jwt = require("jsonwebtoken");
+const SECRET_KEY = "yumtruxsecret69";
 // /payments
 router.post("/intents", createPaymentIntents);
 
@@ -39,5 +41,23 @@ router.post("/createPaypalOrder", createPaypalOrder);
 
 // truck owner payment
 router.post("/truckOwnerPayment", truckOwnerPayment);
+
+const authenticateToken = (req, res, next) => {
+  const authToken = req.headers["authorization"];
+  const token = authToken && authToken.split(" ")[1];
+  if (token == null) return res.sendStatus(401);
+
+  // verify token
+  jwt.verify(token, SECRET_KEY, (err, user) => {
+    if (err) {
+      return res.sendStatus(403);
+    }
+    req.user = user;
+    next();
+  });
+};
+
+// yumtrux monthly payment handle by admin
+router.post("/createNewProduct", authenticateToken, createNewProduct);
 
 module.exports = router;

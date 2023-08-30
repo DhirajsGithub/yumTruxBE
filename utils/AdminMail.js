@@ -1,7 +1,7 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
-const ActionMail = async (email, subject, title, discription) => {
+const ActionMail = async (email, subject, title, discription, links) => {
   let transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -15,61 +15,81 @@ const ActionMail = async (email, subject, title, discription) => {
     to: email,
     subject: subject,
     text: "Hello world",
-    html: `<!DOCTYPE html>
-
-<html>
-<head>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-    }
-    .email-container {
-      background-color: #f5f5f5;
-      padding: 20px;
-      border-radius: 5px;
-    }
-    .title {
-      font-size: 24px;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-    .description {
-      font-size: 16px;
-      margin-bottom: 20px;
-    }
-    .action {
-      font-size: 18px;
-      color: #007bff;
-    }
-    .admin-info {
-      font-size: 14px;
-      margin-top: 10px;
-    }
-    img {
-      max-width: 100%;
-      height: auto;
-    }
-  </style>
-</head>
-<body>
-  <div class="email-container">
-    <p class="title">Important Update: Account Security Enhancement</p>
-    <p class="description">Hello [User's Name],</p>
-    <p>We want to inform you about an action that has been taken regarding your account on our app.</p>
-    <p class="action">Action Taken: Enhanced Account Security Measures</p>
-    <p>Your account security is our top priority. In light of recent events, we have implemented additional security measures to safeguard your account and personal information.</p>
-    <p>If you have any concerns or questions about this action, please feel free to contact our support team.</p>
-    <p>Thank you for being a valued user of our app.</p>
-    <p class="admin-info">Sincerely,</p>
-    <p class="admin-info">yumtrux Administration</p>
-    <div class="admin-info">
-      <img src="https://img.archiexpo.com/pt/images_ae/photo-g/167318-16413478.jpg" alt="yumtrux Administration" width="100">
-    </div>
-  </div>
-</body>
-</html>
-
-    `,
+    html: `<html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Truck Status Update</title>
+      <style>
+        body {
+          margin: 0;
+          padding: 0;
+          background-color: #f5f5f5;
+        }
+        .container {
+          width: 80%;
+          margin: 20px auto;
+          background-color: #f2f2f2;
+          font-family: "Arial", sans-serif;
+          box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+          padding: 20px;
+          border-radius: 16px;
+        }
+        .logo {
+          text-align: center;
+        }
+        .logo img {
+          max-width: 100px;
+          height: auto;
+        }
+        .message {
+          padding: 20px;
+        }
+        .contact-link {
+          text-align: center;
+          margin-top: 20px;
+        }
+        .contact-link a {
+          color: #007bff;
+          text-decoration: none;
+        }
+        .company-name {
+          font-size: 24px;
+          font-weight: bold;
+          color: #333333;
+          text-align: center;
+          margin-top: 10px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="logo">
+          <img
+            src="http://res.cloudinary.com/dk8hyxr2z/image/upload/v1693335141/yumtrux_categories/icon_qzowsb.png"
+            alt="Food Truck Logo"
+          />
+        </div>
+        <div class="company-name">YumTrux</div>
+        <div class="message">
+          <p>Dear User,</p>
+          <p style="font-size: larger">
+            ${title}
+          </p>
+          <p style="font-size: larger"> <strong>Reason:</strong>  ${discription}</p>
+          <p>
+            If you have any questions or need further assistance, please feel free
+            to <a href=${links.link1}>contact the admin</a>.
+          </p>
+        </div>
+        <div class="contact-link">
+          <p>Best regards,</p>
+          <p>The Food Truck Support Team</p>
+          <p><a href=${links.link2}>Contact Us</a></p>
+        </div>
+      </div>
+    </body>
+  </html>`,
   });
 
   return info;
