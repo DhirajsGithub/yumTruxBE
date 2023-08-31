@@ -444,6 +444,55 @@ const MonthlyPriceData = async (req, res) => {
   });
 };
 
+// /admin/deleteProduct
+const deleteProduct = async (req, res) => {
+  const adminSecret = req.user.adminSecret;
+  const { productId } = req.body;
+  const adminId = req.user.adminId;
+  if (!productId) {
+    return res.status(400).json({
+      message: "productId required",
+      status: "error",
+    });
+  }
+  if (adminSecret !== process.env.ADMIN_SECRET) {
+    return res.status(401).json({
+      message: "You are not authorized to access this route",
+      status: "error",
+    });
+  }
+  try {
+    const findAdmin = await adminModel
+      .findByIdAndUpdate(
+        { _id: adminId },
+        {
+          $pull: {
+            MonthlyPriceData: {
+              productId: productId,
+            },
+          },
+        }
+      )
+      .then((admin) => {
+        return res.status(201).send({
+          message: "Successfully deleted the Package",
+          status: "success",
+        });
+      })
+      .catch((err) => {
+        return res.status(400).send({
+          message: "Couldn't find the admin",
+          status: "error",
+        });
+      });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Internal server error",
+      status: "error",
+    });
+  }
+};
+
 module.exports = {
   signin,
   getUsers,
@@ -458,4 +507,5 @@ module.exports = {
   deactivateTruck,
   activateTruck,
   MonthlyPriceData,
+  deleteProduct,
 };

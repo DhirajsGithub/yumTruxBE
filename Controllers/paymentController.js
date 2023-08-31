@@ -275,7 +275,7 @@ const createPaypalOrder = async (req, res) => {
 
 // /payments/truckOwnerPayment
 const truckOwnerPayment = async (req, res) => {
-  const truckId = "64ee244daa0c8d5f1e2f180d"; // Extract the truckId from the query parameters
+  const { truckId } = req.body; // Extract the truckId from the query parameters
   console.log(truckId);
   try {
     let priceIds = await adminModel.find({}).select("MonthlyPriceData");
@@ -311,10 +311,11 @@ const truckOwnerPayment = async (req, res) => {
 // we added a product in stripe dashboard and then we created a price id for that product to put in truckOwnerPayment controller
 
 // yumtrux monthly payment handle by admin
+// /payments/createNewProduct
 const createNewProduct = async (req, res) => {
   const adminSecret = req.user.adminSecret;
   const id = uniqid();
-  const { name, imageUrl, description, price } = req.body;
+  const { name, description, price } = req.body;
   const adminId = req.user.adminId;
 
   if (adminSecret !== process.env.ADMIN_SECRET) {
@@ -326,7 +327,9 @@ const createNewProduct = async (req, res) => {
   try {
     const product = await stripe.products.create({
       name: name,
-      images: [imageUrl],
+      images: [
+        "https://res.cloudinary.com/dk8hyxr2z/image/upload/v1693335141/yumtrux_categories/icon_qzowsb.png",
+      ],
       description: description,
       default_price_data: {
         unit_amount: price, // make sure to convert the price in cents
