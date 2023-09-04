@@ -12,6 +12,7 @@ const {
   updateTruckRating,
   uploadProfileImgMogogDB,
   validate,
+  userStatus,
 } = require("../Controllers/userController");
 const userRoute = express.Router();
 
@@ -42,5 +43,7 @@ userRoute.patch("/uploadProfileImgMogogDB/:userId", uploadProfileImgMogogDB);
 userRoute.get("/truckListDetail", truckListDetail);
 
 userRoute.patch("/updateRating/:truckId", updateTruckRating);
+
+userRoute.get("/userStatus/:userId", userStatus);
 
 module.exports = userRoute;

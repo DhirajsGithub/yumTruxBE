@@ -65,12 +65,7 @@ const signin = async (req, res) => {
     const existingUser = await userModel.findOne({
       email: email,
     });
-    if (existingUser.status === "inactive") {
-      return res.status(400).send({
-        message: "Your account is not active, please contact admin",
-        status: "error",
-      });
-    }
+
     if (!existingUser) {
       return res
         .status(404)
@@ -82,6 +77,12 @@ const signin = async (req, res) => {
       return res
         .status(400)
         .send({ message: "Password doesn't match", status: "error" });
+    }
+    if (existingUser.status === "inactive") {
+      return res.status(400).send({
+        message: "Your account is not active, please contact admin",
+        status: "error",
+      });
     }
     const payload = { id: existingUser._id, email: existingUser.email };
     const secretKey = SECRET_KEY;
@@ -380,6 +381,29 @@ const validate = async (req, res) => {
   }
 };
 
+const userStatus = async (req, res) => {
+  const userId = req.params.userId;
+  try {
+    const findUser = await userModel
+      .findById({ _id: userId })
+      .then((user) => {
+        return res.status(201).send({
+          status: user ? user.status : "inactive",
+          message: "success",
+        });
+      })
+      .catch((err) => {
+        return res
+          .status(400)
+          .send({ message: "Couldn't find the user", status: "error" });
+      });
+  } catch (error) {
+    return res
+      .status(500)
+      .send({ message: "Internal server error", status: "error" });
+  }
+};
+
 module.exports = {
   signin,
   signup,
@@ -393,4 +417,5 @@ module.exports = {
   updateTruckRating,
   uploadProfileImgMogogDB,
   validate,
+  userStatus,
 };

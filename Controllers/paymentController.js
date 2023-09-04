@@ -275,8 +275,9 @@ const createPaypalOrder = async (req, res) => {
 
 // /payments/truckOwnerPayment
 const truckOwnerPayment = async (req, res) => {
-  const { truckId } = req.body; // Extract the truckId from the query parameters
+  const truckId = req.body.truckId; // Extract the truckId from the query parameters
   console.log(truckId);
+
   try {
     let priceIds = await adminModel.find({}).select("MonthlyPriceData");
     priceIds = priceIds[0]?.MonthlyPriceData;
