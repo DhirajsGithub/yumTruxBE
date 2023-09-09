@@ -37,7 +37,7 @@ const signup = async (req, res) => {
         email,
         phoneNo,
         imgUrl:
-          "https://img.freepik.com/premium-vector/account-icon-user-icon-vector-graphics_292645-552.jpg",
+          "https://res.cloudinary.com/dk8hyxr2z/image/upload/v1685710777/yumtrux_users/defaultProfileImg_rrndub.webp",
         address: "",
         ownTrucks: [],
         passwordResetToken: "",
@@ -57,7 +57,7 @@ const signup = async (req, res) => {
       });
     } else {
       return res.status(400).json({
-        message: "email, password, username, address, phone number required",
+        message: "email, password, username, phone number required",
         status: "error",
       });
     }
@@ -99,7 +99,7 @@ const signin = async (req, res) => {
       );
       sendMail(existingTruckOwner.email, existingTruckOwner.username);
       return res.status(201).json({
-        truckData: existingTruckOwner,
+        truckOwnerData: existingTruckOwner,
         token,
         status: "success",
         message: "Successfully login",

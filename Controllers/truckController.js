@@ -270,6 +270,8 @@ const upateBasicData = async (req, res) => {
 };
 
 // /truck/addSchedule/:truckId    ---> add truck schedule
+// dateObj: {date: 16,day: "Mon"}
+// locations: [ {city:  "Snyder, TX", address: "Codgell Memorial Hospital", time: "7 AM - 1 PM"},{city: "Snyder, TX", address: "1 1 4 82nd Street", time: "10 AM - 1 PM"}]
 const addSchedule = async (req, res) => {
   const truckId = req.params.truckId;
   const dateObj = req.body ? req.body.schedule[0].dateObj : null;
@@ -344,10 +346,16 @@ const deleteSchedule = async (req, res) => {
 };
 
 // /truck/addTruckMenu/:truckId/
+// {
+//   "name": "Spring Rolls",
+//   "price": "49.99",
+//   "description": "A crisp appetizer where shredded veggies are enca...",
+//   "imgUrl": "https://i.ndtvimg.com/i/2015-02/spring-roll_625x350_51424323845.jpg"
+// }
 const addTruckMenu = async (req, res) => {
   const truckId = req.params.truckId;
   const name = req.body.name;
-  const price = parseInt(req.body.price);
+  const price = parseFloat(req.body.price);
   const description = req.body.description;
   const imgUrl = req.body.imgUrl;
 
@@ -418,7 +426,7 @@ const deleteTruckMenu = async (req, res) => {
   }
 };
 
-// /truck/updatePaymentId/:truckId    // stripe payment id will be unique or different for each truck, it will be updated through truck id and not truckOwner id
+// /truck/updateStripePaymentId/:truckId    // stripe payment id will be unique or different for each truck, it will be updated through truck id and not truckOwner id
 const updateStripePaymentId = async (req, res) => {
   const truckId = req.params.truckId;
   const paymentId = req.body.paymentId;

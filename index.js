@@ -3,11 +3,24 @@ const connectToMongo = require("./database");
 connectToMongo();
 const express = require("express");
 const fileUpload = require("express-fileupload");
+const { Server } = require("socket.io");
 const cors = require("cors");
 const uniqid = require("uniqid");
-
 const app = express();
 const port = process.env.PORT || 8000;
+
+// ------------------socket io------------------
+const http = require("http");
+
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+  },
+});
+
+// ------------------socket io------------------
+
 const userRoutes = require("./Routes/userRoutes");
 const truckRoutes = require("./Routes/truckRoutes");
 const generalRoutes = require("./Routes/genralRoute");
@@ -58,11 +71,12 @@ app.post("/webhook", async (req, res) => {
     const clientReferenceId = session.client_reference_id;
     if (clientReferenceId) {
       try {
-        let p = await trucksModel.findByIdAndUpdate(
+        let p = trucksModel.findOneAndUpdate(
           { _id: clientReferenceId },
 
           {
             $set: { stripePaymentDate: new Date() },
+
             $push: {
               RechargeDetail: {
                 amount: session.amount_total,
@@ -71,7 +85,7 @@ app.post("/webhook", async (req, res) => {
               },
             },
           },
-          { upsert: true }
+          { upsert: true, new: true }
         );
         console.log(p);
         console.log("updated successfully");
@@ -87,6 +101,23 @@ app.post("/webhook", async (req, res) => {
   res.status(200).end();
 });
 
-app.listen(port, () => {
+io.on("connection", (socket) => {
+  console.log("A user connected ", socket.id);
+
+  // Listen for messages from the client
+  socket.on("send_msg", (message) => {
+    console.log("Received message:", message);
+
+    // Broadcast the message to all connected clients
+    socket.broadcast.emit("receive_msg", message);
+  });
+
+  // Handle disconnections
+  socket.on("disconnect", () => {
+    console.log("A user disconnected");
+  });
+});
+
+server.listen(port, () => {
   console.log(`YumTrux backend app listening at http://localhost:${port}`);
 });

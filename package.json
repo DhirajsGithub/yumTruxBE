@@ -31,7 +31,12 @@
     "nodemailer": "^6.9.3",
     "nodemon": "^2.0.22",
     "otp-generator": "^4.0.1",
+    "socket.io": "^4.7.2",
     "stripe": "^12.8.0",
     "uniqid": "^5.4.0"
+  },
+  "optionalDependencies": {
+    "bufferutil": "^4.0.7",
+    "utf-8-validate": "^6.0.3"
   }
 }

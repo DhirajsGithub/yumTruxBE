@@ -42,6 +42,9 @@ const UserSchema = new Schema({
   status: {
     type: String,
   },
+  notifications: {
+    type: Object,
+  },
 });
 
 module.exports = mongoose.model("user", UserSchema);

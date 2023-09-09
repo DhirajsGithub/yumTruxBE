@@ -26,6 +26,9 @@ const AdminSchems = new Schema({
   MonthlyPriceData: {
     type: Object,
   },
+  notifications: {
+    type: Object,
+  },
 });
 
 module.exports = mongoose.model("admin", AdminSchems);

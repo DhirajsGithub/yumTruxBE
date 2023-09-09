@@ -37,6 +37,9 @@ const TruckOwnerSchema = new Schema({
   joinOn: {
     type: Date,
   },
+  notifications: {
+    type: Object,
+  },
 });
 
 module.exports = mongoose.model("truckOwner", TruckOwnerSchema);

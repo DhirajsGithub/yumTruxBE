@@ -2,7 +2,7 @@
 const mongoose = require("mongoose");
 
 const mongoURI =
-  "mongodb+srv://yumtruk:3CRh3UJMg6RIosYf@cluster0.tzdsj.mongodb.net/YumTruks";
+  "mongodb+srv://yumtruxdeveloper:qTApdZWfUX5zWJYE@yumtrux.tjvv0yt.mongodb.net/?retryWrites=true&w=majority";
 
 // can also create a database just using /databse_name
 
