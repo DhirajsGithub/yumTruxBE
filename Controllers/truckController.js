@@ -128,18 +128,23 @@ const signin = async (req, res) => {
 const addTruck = async (req, res) => {
   const email = req.body.email;
   const truckOwner = await truckOwnerModel.findOne({ email });
+  const { name, category, imgUrl } = req.body;
+  if (!name || !category || !imgUrl)
+    return res.status(400).send({
+      message: "Please fill all missing fields!",
+      status: "error",
+    });
   if (truckOwner) {
     const truck = await trucksModel.create({
-      name: "",
-      category: "",
+      name: name,
+      category: category,
       username: truckOwner.username,
       email: truckOwner.email,
       phoneNo: truckOwner.phoneNo,
       schedule: [],
       latLong: [],
       description: "",
-      imgUrl:
-        "https://assets.traveltriangle.com/blog/wp-content/uploads/2019/08/shutterstock_1095843908.jpg",
+      imgUrl: imgUrl,
       address: "",
       timing: "",
       ratings: [],

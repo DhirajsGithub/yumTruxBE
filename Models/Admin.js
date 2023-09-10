@@ -29,6 +29,9 @@ const AdminSchems = new Schema({
   notifications: {
     type: Object,
   },
+  truckPayments: {
+    type: Object,
+  },
 });
 
 module.exports = mongoose.model("admin", AdminSchems);

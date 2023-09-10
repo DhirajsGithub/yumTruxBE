@@ -30,6 +30,7 @@ const adminRoutes = require("./Routes/adminRoute");
 
 // for webhook
 const trucksModel = require("./Models/Truck");
+const adminModel = require("./Models/Admin");
 
 // to use req.body as json we need to use middle ware
 app.use(
@@ -71,24 +72,48 @@ app.post("/webhook", async (req, res) => {
     const clientReferenceId = session.client_reference_id;
     if (clientReferenceId) {
       try {
-        let p = trucksModel.findOneAndUpdate(
-          { _id: clientReferenceId },
+        let p = trucksModel
+          .findOneAndUpdate(
+            { _id: clientReferenceId },
 
-          {
-            $set: { stripePaymentDate: new Date() },
+            {
+              $set: { stripePaymentDate: new Date() },
 
-            $push: {
-              RechargeDetail: {
-                amount: session.amount_total,
-                date: new Date(),
-                id: uniqid(),
+              $push: {
+                RechargeDetail: {
+                  amount: session.amount_total,
+                  date: new Date(),
+                  id: uniqid(),
+                },
               },
             },
-          },
-          { upsert: true, new: true }
-        );
-        console.log(p);
-        console.log("updated successfully");
+            { upsert: true, new: true }
+          )
+          .then((truck) => {
+            adminModel
+              .updateMany(
+                {},
+                {
+                  $push: {
+                    truckPayments: {
+                      truckId: clientReferenceId,
+                      amount: session.amount_total,
+                      date: new Date(),
+                      id: uniqid(),
+                    },
+                  },
+                }
+              )
+              .then((admin) => {
+                return;
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       } catch (error) {
         console.log(error);
       }
@@ -104,12 +129,17 @@ app.post("/webhook", async (req, res) => {
 io.on("connection", (socket) => {
   console.log("A user connected ", socket.id);
 
-  // Listen for messages from the client
-  socket.on("send_msg", (message) => {
-    console.log("Received message:", message);
+  // emit to particular room
+  socket.on("join_room", (data) => {
+    socket.join(data);
+    console.log("User joined room: " + data);
+  });
 
+  // Listen for messages from the client
+  socket.on("send_msg", (data) => {
     // Broadcast the message to all connected clients
-    socket.broadcast.emit("receive_msg", message);
+    socket.to(data.room).emit("receive_msg", data);
+    console.log(data);
   });
 
   // Handle disconnections
