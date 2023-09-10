@@ -70,6 +70,15 @@ app.post("/webhook", async (req, res) => {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
     const clientReferenceId = session.client_reference_id;
+    const truckDetails = await trucksModel
+      .findById({ _id: clientReferenceId })
+      .then((truck) => {
+        return truck;
+      })
+      .catch((err) => {
+        return {};
+      });
+    console.log("truckDetails ", truckDetails);
     if (clientReferenceId) {
       try {
         let p = trucksModel
@@ -100,6 +109,12 @@ app.post("/webhook", async (req, res) => {
                       amount: session.amount_total,
                       date: new Date(),
                       id: uniqid(),
+                      name: truckDetails?.name,
+                      owner: truckDetails?.email,
+                      phoneNo: truckDetails?.phoneNo,
+                      category: truckDetails?.category,
+                      username: truckDetails?.username,
+                      imgUrl: truckDetails?.imgUrl,
                     },
                   },
                 }
