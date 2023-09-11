@@ -6,6 +6,9 @@ const {
   activateTruck,
   getTruckOwnerTrucks,
   updateBasicInfo,
+  addNotification,
+  updateNotification,
+  getNotifications,
 } = require("../Controllers/TruckOwnerController");
 
 const truckOwnerRoutes = express.Router();
@@ -30,5 +33,17 @@ truckOwnerRoutes.post(
 
 // /truckOwner/updateBasicInfo/:truckOwnerId
 truckOwnerRoutes.put("/updateBasicInfo/:truckOwnerId", updateBasicInfo);
+
+// /truckOwner/addNotification/
+truckOwnerRoutes.put("/addNotification/", addNotification);
+
+// /truckOwner/updateNotification/:truckOwnerId/:notificationId
+truckOwnerRoutes.put(
+  "/updateNotification/:truckOwnerId/:notificationId",
+  updateNotification
+);
+
+// /truckOwner/getNotifications/:truckOwnerId/
+truckOwnerRoutes.get("/getNotifications/:truckOwnerId/", getNotifications);
 
 module.exports = truckOwnerRoutes;

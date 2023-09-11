@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const { sendMail } = require("../utils/SendMail");
 const mongoose = require("mongoose");
 const { ObjectId } = require("mongodb");
+const uniqid = require("uniqid");
 
 const SECRET_KEY = "yumtruxsecret69";
 
@@ -314,6 +315,152 @@ const updateBasicInfo = async (req, res) => {
   }
 };
 
+const addNotification = async (req, res) => {
+  const ids = req.body.ids;
+  const notification = req.body.notification;
+  if (!notification || !ids) {
+    return res.status(400).send({
+      message: "notification and ids required",
+      status: "error",
+    });
+  }
+  try {
+    let owners = await truckOwnerModel
+      .updateMany(
+        { _id: { $in: ids } },
+        {
+          $push: {
+            notifications: {
+              ...notification,
+              date: new Date(),
+              notificationId: uniqid(),
+              viewed: false,
+            },
+          },
+        },
+        { multi: true }
+      )
+      .then((owners) => {
+        return res.status(200).send({
+          message: "Successfully updated notifications",
+          status: "success",
+        });
+      })
+      .catch((err) => {
+        return res.status(400).send({
+          message: "Couldn't find the truck owners",
+          status: "error",
+        });
+      });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Internal server error",
+      status: "error",
+    });
+  }
+};
+
+const updateNotification = async (req, res) => {
+  // if deleteNotification is true then delete the notification
+  // else notification viewed will set to true
+  const deleteNotification = req.body.deleteNotification;
+  const truckOwnerId = req.params.truckOwnerId;
+  const notificationId = req.params.notificationId;
+  if (!truckOwnerId || !notificationId) {
+    return res.status(400).send({
+      message: "truckOwnerId and notificationId required",
+      status: "error",
+    });
+  }
+  if (deleteNotification) {
+    try {
+      let owner = await truckOwnerModel
+        .findOneAndUpdate(
+          { _id: truckOwnerId },
+          { $pull: { notifications: { notificationId: notificationId } } },
+          { new: true }
+        )
+        .then((owner) => {
+          return res.status(200).send({
+            message: "Successfully deleted the notification",
+            status: "success",
+          });
+        })
+        .catch((err) => {
+          return res.status(400).send({
+            message: "Couldn't find the truck owner",
+            status: "error",
+          });
+        });
+    } catch (error) {
+      return res.status(500).send({
+        message: "Internal server error",
+        status: "error",
+      });
+    }
+  } else {
+    try {
+      let owner = await truckOwnerModel
+        .findOneAndUpdate(
+          {
+            _id: truckOwnerId,
+            notifications: { $elemMatch: { notificationId: notificationId } },
+          },
+          { $set: { "notifications.$.viewed": true } },
+          { new: true }
+        )
+        .then((owner) => {
+          return res.status(200).send({
+            message: "Successfully updated the notification",
+            status: "success",
+          });
+        })
+        .catch((err) => {
+          return res.status(400).send({
+            message: "Couldn't find the truck owner",
+            status: "error",
+          });
+        });
+    } catch (error) {
+      return res.status(500).send({
+        message: "Internal server error",
+        status: "error",
+      });
+    }
+  }
+};
+const getNotifications = async (req, res) => {
+  const truckOwnerId = req.params.truckOwnerId;
+  if (!truckOwnerId) {
+    return res.status(400).send({
+      message: "truckOwnerId required",
+      status: "error",
+    });
+  }
+  try {
+    let owner = await truckOwnerModel
+      .findById({ _id: truckOwnerId })
+      .then((owner) => {
+        return res.status(200).send({
+          notifications: owner.notifications,
+          message: "Successfully fetched the notifications",
+          status: "success",
+        });
+      })
+      .catch((err) => {
+        return res.status(400).send({
+          message: "Couldn't find the truck owner",
+          status: "error",
+        });
+      });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Internal server error",
+      status: "error",
+    });
+  }
+};
+
 module.exports = {
   signup,
   signin,
@@ -321,4 +468,7 @@ module.exports = {
   activateTruck,
   getTruckOwnerTrucks,
   updateBasicInfo,
+  addNotification,
+  updateNotification,
+  getNotifications,
 };

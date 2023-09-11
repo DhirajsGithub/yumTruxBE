@@ -150,11 +150,11 @@ io.on("connection", (socket) => {
     console.log("User joined room: " + data);
   });
 
-  // Listen for messages from the client
   socket.on("send_msg", (data) => {
-    // Broadcast the message to all connected clients
-    socket.to(data.room).emit("receive_msg", data);
-    console.log(data);
+    // Broadcast the message to the specified rooms
+    data.room.forEach((room) => {
+      socket.to(room).emit("receive_msg", data);
+    });
   });
 
   // Handle disconnections

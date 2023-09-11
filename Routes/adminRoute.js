@@ -15,6 +15,9 @@ const {
   activateTruck,
   MonthlyPriceData,
   deleteProduct,
+  addNotification,
+  updateNotification,
+  getNotifications,
 } = require("../Controllers/adminController");
 const adminRoutes = express.Router();
 const jwt = require("jsonwebtoken");
@@ -75,5 +78,14 @@ adminRoutes.get("/MonthlyPriceData/", authenticateToken, MonthlyPriceData);
 
 // /admin/deleteProduct
 adminRoutes.delete("/deleteProduct/", authenticateToken, deleteProduct);
+
+// /admin/addNotification
+adminRoutes.put("/addNotification/", addNotification);
+
+// /admin/updateNotification/:notificationId
+adminRoutes.put("/updateNotification/:notificationId", updateNotification);
+
+// /admin/getNotifications
+adminRoutes.get("/getNotifications/", authenticateToken, getNotifications);
 
 module.exports = adminRoutes;

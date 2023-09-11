@@ -275,8 +275,8 @@ const createPaypalOrder = async (req, res) => {
 
 // /payments/truckOwnerPayment
 const truckOwnerPayment = async (req, res) => {
-  // const truckId = req.query.truckId; // Extract the truckId from the query parameters
-  const truckId = "64fcbc34d30426c5c0112c8a";
+  const truckId = req.query.truckId; // Extract the truckId from the query parameters
+  // const truckId = "64fcbc34d30426c5c0112c8a";
   console.log(truckId);
 
   try {

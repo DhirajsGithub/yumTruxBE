@@ -32,6 +32,9 @@ const AdminSchems = new Schema({
   truckPayments: {
     type: Object,
   },
+  userPayments: {
+    type: Object,
+  },
 });
 
 module.exports = mongoose.model("admin", AdminSchems);

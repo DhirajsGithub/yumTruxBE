@@ -493,6 +493,154 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+// admin/addNotification
+const addNotification = async (req, res) => {
+  const notification = req.body.notification;
+  if (!notification) {
+    return res.status(400).send({
+      message: "notification required",
+      status: "error",
+    });
+  }
+  try {
+    let owners = await adminModel
+      .updateMany(
+        {},
+        {
+          $push: {
+            notifications: {
+              ...notification,
+              date: new Date(),
+              notificationId: uniqid(),
+              viewed: false,
+            },
+          },
+        },
+        { multi: true }
+      )
+      .then((owners) => {
+        return res.status(200).send({
+          message: "Successfully updated notifications",
+          status: "success",
+        });
+      })
+      .catch((err) => {
+        return res.status(400).send({
+          message: "Couldn't find the truck owners",
+          status: "error",
+        });
+      });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Internal server error",
+      status: "error",
+    });
+  }
+};
+
+// admin/updateNotification
+const updateNotification = async (req, res) => {
+  // if deleteNotification is true then delete the notification
+  // else notification viewed will set to true
+  const deleteNotification = req.body.deleteNotification;
+  const notificationId = req.params.notificationId;
+  if (!notificationId) {
+    return res.status(400).send({
+      message: "delete Notification bool and notificationId required",
+      status: "error",
+    });
+  }
+  if (deleteNotification) {
+    try {
+      let owner = await adminModel
+        .updateMany(
+          {},
+          { $pull: { notifications: { notificationId: notificationId } } },
+          { new: true }
+        )
+        .then((owner) => {
+          return res.status(200).send({
+            message: "Successfully deleted the notification",
+            status: "success",
+          });
+        })
+        .catch((err) => {
+          return res.status(400).send({
+            message: "Couldn't find the truck owner",
+            status: "error",
+          });
+        });
+    } catch (error) {
+      return res.status(500).send({
+        message: "Internal server error",
+        status: "error",
+      });
+    }
+  } else {
+    try {
+      let owner = await adminModel
+        .updateMany(
+          {
+            notifications: { $elemMatch: { notificationId: notificationId } },
+          },
+          { $set: { "notifications.$.viewed": true } },
+          { new: true }
+        )
+        .then((owner) => {
+          return res.status(200).send({
+            message: "Successfully updated the notification",
+            status: "success",
+          });
+        })
+        .catch((err) => {
+          return res.status(400).send({
+            message: "Couldn't find the truck owner",
+            status: "error",
+          });
+        });
+    } catch (error) {
+      return res.status(500).send({
+        message: "Internal server error",
+        status: "error",
+      });
+    }
+  }
+};
+
+// /admin/getNotifications
+const getNotifications = async (req, res) => {
+  const adminSecret = req.user.adminSecret;
+  if (adminSecret !== process.env.ADMIN_SECRET) {
+    return res.status(401).json({
+      message: "You are not authorized to access this route",
+      status: "error",
+    });
+  }
+  try {
+    let owner = await adminModel
+      .find({})
+      .then((owner) => {
+        console.log(owner);
+        return res.status(200).send({
+          notifications: owner[0]?.notifications ? owner[0]?.notifications : [],
+          message: "Successfully fetched the notifications",
+          status: "success",
+        });
+      })
+      .catch((err) => {
+        return res.status(400).send({
+          message: "Couldn't find the truck owner",
+          status: "error",
+        });
+      });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Internal server error",
+      status: "error",
+    });
+  }
+};
+
 module.exports = {
   signin,
   getUsers,
@@ -508,4 +656,7 @@ module.exports = {
   activateTruck,
   MonthlyPriceData,
   deleteProduct,
+  addNotification,
+  updateNotification,
+  getNotifications,
 };
