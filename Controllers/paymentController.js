@@ -41,8 +41,8 @@ const createConnectAccountLink = async (req, res) => {
     try {
       const accountLink = await stripe.accountLinks.create({
         account: paymentId, // destination or let say truck owner destination
-        refresh_url: refreshUrl,
-        return_url: returnUrl,
+        refresh_url: "https://panel.yumtrux.com/trucksFound",
+        return_url: "https://panel.yumtrux.com/trucksFound",
         type: "account_onboarding",
       });
       return res.status(201).send(accountLink);
@@ -169,10 +169,10 @@ const generatePaypalSignupLink = async (req, res) => {
     partner_config_override: {
       partner_logo_url:
         "https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg",
-      return_url: "https://stripe.com/docs/api/authentication",
+      return_url: "https://panel.yumtrux.com/trucksFound",
       return_url_description:
         "the url to return the merchant after the paypal onboarding process.",
-      action_renewal_url: "https://testenterprises.com/renew-exprired-url",
+      action_renewal_url: "https://panel.yumtrux.com/trucksFound",
       show_add_credit_card: true,
     },
   });
