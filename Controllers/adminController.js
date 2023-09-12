@@ -511,7 +511,6 @@ const addNotification = async (req, res) => {
             notifications: {
               ...notification,
               date: new Date(),
-              notificationId: uniqid(),
               viewed: false,
             },
           },
@@ -542,6 +541,13 @@ const addNotification = async (req, res) => {
 const updateNotification = async (req, res) => {
   // if deleteNotification is true then delete the notification
   // else notification viewed will set to true
+  const adminSecret = req.user.adminSecret;
+  if (adminSecret !== process.env.ADMIN_SECRET) {
+    return res.status(401).json({
+      message: "You are not authorized to access this route",
+      status: "error",
+    });
+  }
   const deleteNotification = req.body.deleteNotification;
   const notificationId = req.params.notificationId;
   if (!notificationId) {
@@ -620,7 +626,6 @@ const getNotifications = async (req, res) => {
     let owner = await adminModel
       .find({})
       .then((owner) => {
-        console.log(owner);
         return res.status(200).send({
           notifications: owner[0]?.notifications ? owner[0]?.notifications : [],
           message: "Successfully fetched the notifications",

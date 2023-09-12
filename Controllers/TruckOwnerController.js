@@ -333,7 +333,6 @@ const addNotification = async (req, res) => {
             notifications: {
               ...notification,
               date: new Date(),
-              notificationId: uniqid(),
               viewed: false,
             },
           },
@@ -363,7 +362,7 @@ const addNotification = async (req, res) => {
 const updateNotification = async (req, res) => {
   // if deleteNotification is true then delete the notification
   // else notification viewed will set to true
-  const deleteNotification = req.body.deleteNotification;
+  const deleteNotification = req.body.deleteNotification; // boolean
   const truckOwnerId = req.params.truckOwnerId;
   const notificationId = req.params.notificationId;
   if (!truckOwnerId || !notificationId) {

@@ -83,7 +83,11 @@ adminRoutes.delete("/deleteProduct/", authenticateToken, deleteProduct);
 adminRoutes.put("/addNotification/", addNotification);
 
 // /admin/updateNotification/:notificationId
-adminRoutes.put("/updateNotification/:notificationId", updateNotification);
+adminRoutes.put(
+  "/updateNotification/:notificationId",
+  authenticateToken,
+  updateNotification
+);
 
 // /admin/getNotifications
 adminRoutes.get("/getNotifications/", authenticateToken, getNotifications);

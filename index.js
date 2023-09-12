@@ -106,7 +106,7 @@ app.post("/webhook", async (req, res) => {
                   $push: {
                     truckPayments: {
                       truckId: clientReferenceId,
-                      amount: session.amount_total,
+                      amount: parseFloat(session.amount_total / 100),
                       date: new Date(),
                       id: uniqid(),
                       name: truckDetails?.name,
