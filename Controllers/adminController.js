@@ -646,6 +646,39 @@ const getNotifications = async (req, res) => {
   }
 };
 
+// /admin/getTrucksPayment
+const getTrucksPayment = async (req, res) => {
+  const adminSecret = req.user.adminSecret;
+  if (adminSecret !== process.env.ADMIN_SECRET) {
+    return res.status(401).json({
+      message: "You are not authorized to access this route",
+      status: "error",
+    });
+  }
+  try {
+    let owner = await adminModel
+      .find({})
+      .then((owner) => {
+        return res.status(200).send({
+          truckPayments: owner[0]?.truckPayments ? owner[0]?.truckPayments : [],
+          message: "Successfully fetched the truckPayments",
+          status: "success",
+        });
+      })
+      .catch((err) => {
+        return res.status(400).send({
+          message: "Couldn't find the truck owner",
+          status: "error",
+        });
+      });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Internal server error",
+      status: "error",
+    });
+  }
+};
+
 module.exports = {
   signin,
   getUsers,
@@ -664,4 +697,5 @@ module.exports = {
   addNotification,
   updateNotification,
   getNotifications,
+  getTrucksPayment,
 };

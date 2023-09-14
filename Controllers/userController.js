@@ -1,5 +1,6 @@
 const userModel = require("../Models/User");
 const trucksModel = require("../Models/Truck");
+const fetch = require("node-fetch");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const uniqid = require("uniqid");
@@ -404,6 +405,88 @@ const userStatus = async (req, res) => {
   }
 };
 
+const addExpoPushToken = async (req, res) => {
+  const userId = req.params.userId;
+  const expoPushToken = req.body.expoPushToken;
+
+  if (!userId || !expoPushToken) {
+    return res.status(400).send({
+      message: "Please provide userId and expoPushToken",
+      status: "error",
+    });
+  }
+  try {
+    const user = await userModel
+      .findByIdAndUpdate({ _id: userId }, { expoPushToken })
+      .then((user) => {
+        return res.status(201).send({
+          message: "Successfully added expoPushToken",
+          status: "success",
+        });
+      })
+      .catch((err) => {
+        return res.status(400).send({
+          message: "Couldn't find the user",
+          status: "error",
+        });
+      });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Internal server error",
+      status: "error",
+    });
+  }
+};
+
+const sendPushNotification = async (req, res) => {
+  const expoPushToken = req.body.expoPushToken;
+  const title = req.body.title;
+  const body = req.body.body;
+  const data = req.body.data;
+  if (!expoPushToken || !title || !body || !data) {
+    return res.status(400).send({
+      message: "Please provide expoPushToken, title, body and data",
+      status: "error",
+    });
+  }
+  const url = "https://exp.host/--/api/v2/push/send";
+  const message = {
+    to: expoPushToken,
+    sound: "default",
+    title,
+    body,
+    data,
+  };
+  try {
+    let response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Accept-encoding": "gzip, deflate",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(message),
+    });
+    response = await response.json();
+    if (!response.errors) {
+      return res.status(201).send({
+        message: "Successfully sent push notification",
+        status: "success",
+        response,
+      });
+    }
+    return res.status(400).send({
+      message: "Couldn't send push notification",
+      status: "error",
+      response,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Internal server error",
+      status: "error",
+    });
+  }
+};
+
 module.exports = {
   signin,
   signup,
@@ -418,4 +501,6 @@ module.exports = {
   uploadProfileImgMogogDB,
   validate,
   userStatus,
+  addExpoPushToken,
+  sendPushNotification,
 };

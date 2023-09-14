@@ -13,6 +13,8 @@ const {
   uploadProfileImgMogogDB,
   validate,
   userStatus,
+  addExpoPushToken,
+  sendPushNotification,
 } = require("../Controllers/userController");
 const userRoute = express.Router();
 
@@ -45,5 +47,9 @@ userRoute.get("/truckListDetail", truckListDetail);
 userRoute.patch("/updateRating/:truckId", updateTruckRating);
 
 userRoute.get("/userStatus/:userId", userStatus);
+
+userRoute.put("/addExpoPushToken/:userId", addExpoPushToken);
+
+userRoute.post("/sendPushNotification", sendPushNotification);
 
 module.exports = userRoute;

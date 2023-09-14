@@ -45,6 +45,9 @@ const UserSchema = new Schema({
   notifications: {
     type: Object,
   },
+  expoPushToken: {
+    type: String,
+  },
 });
 
 module.exports = mongoose.model("user", UserSchema);
