@@ -15,6 +15,9 @@ const {
   userStatus,
   addExpoPushToken,
   sendPushNotification,
+  addNotification,
+  updateNotification,
+  getNotifications,
 } = require("../Controllers/userController");
 const userRoute = express.Router();
 
@@ -51,5 +54,17 @@ userRoute.get("/userStatus/:userId", userStatus);
 userRoute.put("/addExpoPushToken/:userId", addExpoPushToken);
 
 userRoute.post("/sendPushNotification", sendPushNotification);
+
+// /addNotification/
+userRoute.put("/addNotification/", addNotification);
+
+// /updateNotification/:userId/:notificationId
+userRoute.put(
+  "/updateNotification/:userId/:notificationId",
+  updateNotification
+);
+
+// /getNotifications/:userId/
+userRoute.get("/getNotifications/:userId/", getNotifications);
 
 module.exports = userRoute;

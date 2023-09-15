@@ -17,12 +17,7 @@ const AdminSchems = new Schema({
   categories: {
     type: Object,
   },
-  paymentId: {
-    type: String,
-  },
-  payments: {
-    type: Object,
-  },
+
   MonthlyPriceData: {
     type: Object,
   },
@@ -32,7 +27,7 @@ const AdminSchems = new Schema({
   truckPayments: {
     type: Object,
   },
-  userPayments: {
+  allOrdersDetail: {
     type: Object,
   },
 });

@@ -679,6 +679,48 @@ const getTrucksPayment = async (req, res) => {
   }
 };
 
+// /admin/addToAllOrdersDetail
+const addToAllOrdersDetail = async (req, res) => {
+  const order = req.body.order;
+  if (!order) {
+    return res.status(400).send({
+      message: "order required",
+      status: "error",
+    });
+  }
+  try {
+    let owners = await adminModel
+      .updateMany(
+        {},
+        {
+          $push: {
+            allOrdersDetail: {
+              ...order,
+            },
+          },
+        },
+        { multi: true }
+      )
+      .then((owners) => {
+        return res.status(200).send({
+          message: "Successfully updated allOrdersDetail",
+          status: "success",
+        });
+      })
+      .catch((err) => {
+        return res.status(400).send({
+          message: "Couldn't find the admin",
+          status: "error",
+        });
+      });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Internal server error",
+      status: "error",
+    });
+  }
+};
+
 module.exports = {
   signin,
   getUsers,
@@ -698,4 +740,5 @@ module.exports = {
   updateNotification,
   getNotifications,
   getTrucksPayment,
+  addToAllOrdersDetail,
 };

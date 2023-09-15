@@ -19,6 +19,7 @@ const {
   updateNotification,
   getNotifications,
   getTrucksPayment,
+  addToAllOrdersDetail,
 } = require("../Controllers/adminController");
 const adminRoutes = express.Router();
 const jwt = require("jsonwebtoken");
@@ -95,5 +96,8 @@ adminRoutes.get("/getNotifications/", authenticateToken, getNotifications);
 
 // /admin/getTrucksPayment
 adminRoutes.get("/getTrucksPayment/", authenticateToken, getTrucksPayment);
+
+// /admin/addToAllOrdersDetail
+adminRoutes.put("/addToAllOrdersDetail", addToAllOrdersDetail);
 
 module.exports = adminRoutes;

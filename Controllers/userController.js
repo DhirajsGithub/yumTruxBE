@@ -41,6 +41,8 @@ const signup = async (req, res) => {
       address: "",
       passwordResetToken: "",
       status: "active",
+      notifications: [],
+      expoPushToken: "",
     });
 
     const token = jwt.sign({ email: result.email, id: result._id }, SECRET_KEY);
@@ -107,12 +109,11 @@ const signin = async (req, res) => {
 const orderHistory = async (req, res) => {
   const userId = req.params.userId;
   const order = req.body.order;
-  const newObjectId = uniqid();
   try {
     const findUser = await userModel
       .findByIdAndUpdate(
         { _id: userId },
-        { $push: { orderHistory: { ...order, orderId: newObjectId } } }
+        { $push: { orderHistory: { ...order } } }
       )
 
       .then((user) => {
@@ -487,6 +488,152 @@ const sendPushNotification = async (req, res) => {
   }
 };
 
+const addNotification = async (req, res) => {
+  const ids = req.body.ids; // user ids, must be in array
+  const notification = req.body.notification;
+  if (!notification || !ids) {
+    return res.status(400).send({
+      message: "notification and ids required",
+      status: "error",
+    });
+  }
+  try {
+    let user = await userModel
+      .updateMany(
+        { _id: { $in: ids } },
+        {
+          $push: {
+            notifications: {
+              ...notification,
+              date: new Date(),
+              viewed: false,
+            },
+          },
+        },
+        { multi: true }
+      )
+      .then((owners) => {
+        return res.status(200).send({
+          message: "Successfully updated notifications",
+          status: "success",
+        });
+      })
+      .catch((err) => {
+        return res.status(400).send({
+          message: "Couldn't find the user",
+          status: "error",
+        });
+      });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Internal server error",
+      status: "error",
+    });
+  }
+};
+
+const updateNotification = async (req, res) => {
+  // if deleteNotification is true then delete the notification
+  // else notification viewed will set to true
+  const deleteNotification = req.body.deleteNotification; // boolean
+  const userId = req.params.userId;
+  const notificationId = req.params.notificationId;
+  if (!userId || !notificationId) {
+    return res.status(400).send({
+      message: "userId and notificationId required",
+      status: "error",
+    });
+  }
+
+  if (deleteNotification) {
+    try {
+      let owner = await userModel
+        .findOneAndUpdate(
+          { _id: userId },
+          { $pull: { notifications: { notificationId: notificationId } } },
+          { new: true }
+        )
+        .then((owner) => {
+          return res.status(200).send({
+            message: "Successfully deleted the notification",
+            status: "success",
+          });
+        })
+        .catch((err) => {
+          return res.status(400).send({
+            message: "Couldn't find the user",
+            status: "error",
+          });
+        });
+    } catch (error) {
+      return res.status(500).send({
+        message: "Internal server error",
+        status: "error",
+      });
+    }
+  } else {
+    try {
+      let owner = await userModel
+        .findOneAndUpdate(
+          {
+            _id: userId,
+            notifications: { $elemMatch: { notificationId: notificationId } },
+          },
+          { $set: { "notifications.$.viewed": true } },
+          { new: true }
+        )
+        .then((owner) => {
+          return res.status(200).send({
+            message: "Successfully updated the notification",
+            status: "success",
+          });
+        })
+        .catch((err) => {
+          return res.status(400).send({
+            message: "Couldn't find the user",
+            status: "error",
+          });
+        });
+    } catch (error) {
+      return res.status(500).send({
+        message: "Internal server error",
+        status: "error",
+      });
+    }
+  }
+};
+const getNotifications = async (req, res) => {
+  const userId = req.params.userId;
+  if (!userId) {
+    return res.status(400).send({
+      message: "userId required",
+      status: "error",
+    });
+  }
+  try {
+    let owner = await userModel
+      .findById({ _id: userId })
+      .then((owner) => {
+        return res.status(200).send({
+          notifications: owner.notifications,
+          message: "Successfully fetched the notifications",
+          status: "success",
+        });
+      })
+      .catch((err) => {
+        return res.status(400).send({
+          message: "Couldn't find the user",
+          status: "error",
+        });
+      });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Internal server error",
+      status: "error",
+    });
+  }
+};
+
 module.exports = {
   signin,
   signup,
@@ -503,4 +650,7 @@ module.exports = {
   userStatus,
   addExpoPushToken,
   sendPushNotification,
+  addNotification,
+  updateNotification,
+  getNotifications,
 };

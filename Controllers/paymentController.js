@@ -57,6 +57,7 @@ const createConnectAccountLink = async (req, res) => {
 const createPaymentSheet = async (req, res) => {
   const amount = req.body.amount;
   const paymentId = req.body.paymentId;
+  const stripePlatformAmount = req.body.stripePlatformAmount;
   try {
     // Use an existing Customer ID if this is a returning customer.
     const customer = await stripe.customers.create();
@@ -65,13 +66,13 @@ const createPaymentSheet = async (req, res) => {
       { apiVersion: "2022-11-15" }
     );
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount, // $10.99
+      amount: amount, //  1099 to $10.99
       currency: "usd",
       customer: customer.id,
       automatic_payment_methods: {
         enabled: true,
       },
-      application_fee_amount: 0, // will be store as collection fee for each transaction
+      application_fee_amount: stripePlatformAmount, // will be store as collection fee for each transaction
       transfer_data: {
         destination: paymentId, // destination
       },
