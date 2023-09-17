@@ -48,6 +48,7 @@ app.use("/payments", paymentRoutes);
 app.use("/truckOwner", truckOwnerRoutes);
 app.use("/admin", adminRoutes);
 
+const paymentId = uniqid();
 app.post("/webhook", async (req, res) => {
   const event = req.body;
 
@@ -78,59 +79,45 @@ app.post("/webhook", async (req, res) => {
       .catch((err) => {
         return {};
       });
-    console.log("truckDetails ", truckDetails);
+    console.log("in web hook ");
     if (clientReferenceId) {
       try {
-        let p = trucksModel
-          .findOneAndUpdate(
-            { _id: clientReferenceId },
-
-            {
-              $set: { stripePaymentDate: new Date() },
-
-              $push: {
-                RechargeDetail: {
-                  amount: session.amount_total,
-                  date: new Date(),
-                  id: uniqid(),
-                },
+        let p = await trucksModel.findOneAndUpdate(
+          { _id: clientReferenceId },
+          {
+            $set: { stripePaymentDate: new Date() },
+            $push: {
+              RechargeDetail: {
+                amount: session.amount_total,
+                date: new Date(),
+                id: paymentId,
               },
             },
-            { upsert: true, new: true }
-          )
-          .then((truck) => {
-            adminModel
-              .updateMany(
-                {},
-                {
-                  $push: {
-                    truckPayments: {
-                      truckId: clientReferenceId,
-                      amount: parseFloat(session.amount_total / 100),
-                      date: new Date(),
-                      id: uniqid(),
-                      name: truckDetails?.name,
-                      owner: truckDetails?.email,
-                      phoneNo: truckDetails?.phoneNo,
-                      category: truckDetails?.category,
-                      username: truckDetails?.username,
-                      imgUrl: truckDetails?.imgUrl,
-                    },
-                  },
-                }
-              )
-              .then((admin) => {
-                return;
-              })
-              .catch((err) => {
-                console.log(err);
-              });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+          },
+          { upsert: true, new: true }
+        );
+        let p2 = await adminModel.updateMany(
+          {},
+          {
+            $push: {
+              truckPayments: {
+                truckId: clientReferenceId,
+                amount: parseFloat(session.amount_total / 100),
+                date: new Date(),
+                id: paymentId,
+                name: truckDetails?.name,
+                owner: truckDetails?.email,
+                phoneNo: truckDetails?.phoneNo,
+                category: truckDetails?.category,
+                username: truckDetails?.username,
+                imgUrl: truckDetails?.imgUrl,
+              },
+            },
+          },
+          { upsert: true, new: true }
+        );
       } catch (error) {
-        console.log(error);
+        return;
       }
     }
     console.log(
@@ -138,7 +125,7 @@ app.post("/webhook", async (req, res) => {
       clientReferenceId
     );
   }
-  res.status(200).end();
+  return res.status(200).end();
 });
 
 io.on("connection", (socket) => {
