@@ -81,13 +81,25 @@ app.post("/webhook", async (req, res) => {
     console.log("truckDetails ", truckDetails);
     if (clientReferenceId) {
       try {
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+
+        const endOfDay = new Date();
+        endOfDay.setHours(23, 59, 59, 999);
+
         let p = trucksModel
           .findOneAndUpdate(
-            { _id: clientReferenceId },
-
+            {
+              _id: clientReferenceId,
+              "RechargeDetail.date": {
+                $not: {
+                  $gte: startOfDay,
+                  $lte: endOfDay,
+                },
+              },
+            },
             {
               $set: { stripePaymentDate: new Date() },
-
               $push: {
                 RechargeDetail: {
                   amount: session.amount_total,
@@ -96,7 +108,7 @@ app.post("/webhook", async (req, res) => {
                 },
               },
             },
-            { upsert: true, new: true }
+            {  new: true }
           )
           .then((truck) => {
             adminModel

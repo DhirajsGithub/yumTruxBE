@@ -501,7 +501,7 @@ const addOrderToTruck = async (req, res) => {
         const findTruck = await trucksModel
           .findByIdAndUpdate(
             { _id: truckId },
-            { $push: { orders: { ...order } } }
+            { $push: { orders: { ...order, orderId: uniqid() } } }
           )
           .then((truck) => {
             return res.status(201).send({

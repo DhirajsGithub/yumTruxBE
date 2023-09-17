@@ -245,6 +245,7 @@ const truckListDetail = async (req, res) => {
             truck.address.length > 0 &&
             truck.timing.length > 0 &&
             truck.menu.length > 0 &&
+            (truck.paypalEmail || truck.paymentId) &&
             truck?.stripePaymentDate &&
             addDays(new Date(truck?.stripePaymentDate), 30) > new Date() &&
             truck.adminStatus === "active"
