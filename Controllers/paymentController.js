@@ -294,8 +294,8 @@ const truckOwnerPayment = async (req, res) => {
           },
         ],
         mode: "payment",
-        success_url: `http://localhost:3000/truck-owner/pay?success=true`, // CHANGE TO yumtrux.com
-        cancel_url: `http://localhost:3000/truck-owner/pay?canceled=true`, // CHANGE TO yumtrux.com
+        success_url: `https://panel.yumtrux.com/trucksFound`, // CHANGE TO yumtrux.com
+        cancel_url: `https://panel.yumtrux.com/trucksFound`, // CHANGE TO yumtrux.com
         client_reference_id: truckId,
       });
 
