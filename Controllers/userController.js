@@ -109,11 +109,21 @@ const signin = async (req, res) => {
 const orderHistory = async (req, res) => {
   const userId = req.params.userId;
   const order = req.body.order;
+  const notification = req.body.notification;
   try {
     const findUser = await userModel
       .findByIdAndUpdate(
         { _id: userId },
-        { $push: { orderHistory: { ...order } } }
+        {
+          $push: {
+            orderHistory: { ...order },
+            notifications: {
+              ...notification,
+              date: new Date(),
+              viewed: false,
+            },
+          },
+        }
       )
 
       .then((user) => {
@@ -225,10 +235,6 @@ function addDays(date, days) {
   return date;
 }
 
-const date = new Date("2022-05-15T00:00:00.000Z");
-
-const newDate = addDays(date, 5);
-
 // truckListDetail
 const truckListDetail = async (req, res) => {
   try {
@@ -245,6 +251,7 @@ const truckListDetail = async (req, res) => {
             truck.address.length > 0 &&
             truck.timing.length > 0 &&
             truck.menu.length > 0 &&
+            (truck.paypalEmail || truck.paymentId) &&
             truck?.stripePaymentDate &&
             addDays(new Date(truck?.stripePaymentDate), 30) > new Date() &&
             truck.adminStatus === "active"

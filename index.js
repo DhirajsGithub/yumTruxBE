@@ -82,40 +82,73 @@ app.post("/webhook", async (req, res) => {
     console.log("in web hook ");
     if (clientReferenceId) {
       try {
-        let p = await trucksModel.findOneAndUpdate(
-          { _id: clientReferenceId },
-          {
-            $set: { stripePaymentDate: new Date() },
-            $push: {
-              RechargeDetail: {
-                amount: session.amount_total,
-                date: new Date(),
-                id: paymentId,
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+
+        const endOfDay = new Date();
+        endOfDay.setHours(23, 59, 59, 999);
+
+        let p = trucksModel
+          .findOneAndUpdate(
+            {
+              _id: clientReferenceId,
+              "RechargeDetail.date": {
+                $not: {
+                  $gte: startOfDay,
+                  $lte: endOfDay,
+                },
               },
             },
-          },
-          { upsert: true, new: true }
-        );
-        let p2 = await adminModel.updateMany(
-          {},
-          {
-            $push: {
-              truckPayments: {
-                truckId: clientReferenceId,
-                amount: parseFloat(session.amount_total / 100),
-                date: new Date(),
-                id: paymentId,
-                name: truckDetails?.name,
-                owner: truckDetails?.email,
-                phoneNo: truckDetails?.phoneNo,
-                category: truckDetails?.category,
-                username: truckDetails?.username,
-                imgUrl: truckDetails?.imgUrl,
+            {
+              $set: { stripePaymentDate: new Date() },
+              $push: {
+                RechargeDetail: {
+                  amount: session.amount_total,
+                  date: new Date(),
+                  id: uniqid(),
+                },
               },
             },
-          },
-          { upsert: true, new: true }
-        );
+            { new: true }
+          )
+          .then((truck) => {
+            adminModel
+              .updateMany(
+                {
+                  "truckPayments.date": {
+                    $not: {
+                      $gte: startOfDay,
+                      $lte: endOfDay,
+                    },
+                  },
+                },
+                {
+                  $push: {
+                    truckPayments: {
+                      truckId: clientReferenceId,
+                      amount: parseFloat(session.amount_total / 100),
+                      date: new Date(),
+                      id: uniqid(),
+                      name: truckDetails?.name,
+                      owner: truckDetails?.email,
+                      phoneNo: truckDetails?.phoneNo,
+                      category: truckDetails?.category,
+                      username: truckDetails?.username,
+                      imgUrl: truckDetails?.imgUrl,
+                    },
+                  },
+                }
+              )
+              .then((admin) => {
+                return;
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       } catch (error) {
         return;
       }

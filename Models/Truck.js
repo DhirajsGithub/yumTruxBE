@@ -65,6 +65,9 @@ const TruckSchema = new Schema({
   adminStatus: {
     type: String,
   },
+  notifications: {
+    type: Object,
+  },
 });
 
 module.exports = mongoose.model("truck", TruckSchema);

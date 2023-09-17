@@ -4,6 +4,8 @@ const truckOwnerModel = require("../Models/TruckOwner");
 const bcrypt = require("bcrypt");
 const { PasswordResetMail } = require("../utils/PasswordResetMail");
 const userModel = require("../Models/User");
+const adminModel = require("../Models/Admin");
+const trucksModel = require("../Models/Truck");
 
 const getReqeuest = async (req, res) => {
   return res.send("Welcome to YumTrux :) \nWe are here for your serving 3");
@@ -171,9 +173,47 @@ const passwordReset = async (req, res) => {
   }
 };
 
+const updateOrderStatusByTruck = async (req, res) => {
+  const status = req.body.status;
+  const truckId = req.body.truckId;
+  const userId = req.body.userId;
+  const orderId = req.body.orderId;
+  // need to configure if user or truck or admin deletes a specific order from their order history then this api won't work
+  // we didn't make such api to delete order from order history so it's fine for now
+  try {
+    let user = await userModel.findOneAndUpdate(
+      { _id: userId, orderHistory: { $elemMatch: { orderId: orderId } } },
+      { $set: { "orderHistory.$.status": status } }
+    );
+    let truck = await trucksModel.findOneAndUpdate(
+      { _id: truckId, orders: { $elemMatch: { orderId: orderId } } },
+      { $set: { "orders.$.status": status } }
+    );
+    let admin = await adminModel.findOneAndUpdate(
+      { allOrdersDetail: { $elemMatch: { orderId: orderId } } },
+      { $set: { "allOrdersDetail.$.status": status } }
+    );
+    if (user && truck && admin) {
+      return res.status(200).send({
+        message: "Order status updated successfully",
+        status: "success",
+      });
+    } else {
+      return res
+        .status(400)
+        .send({ message: "Couldn't update order status", status: "error" });
+    }
+  } catch (error) {
+    return res
+      .status(500)
+      .send({ message: "Internal server error", status: "error" });
+  }
+};
+
 module.exports = {
   getReqeuest,
   sample,
   passwordReset,
   sendEmailForPasswordReset,
+  updateOrderStatusByTruck,
 };

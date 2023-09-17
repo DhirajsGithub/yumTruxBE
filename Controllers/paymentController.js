@@ -276,8 +276,8 @@ const createPaypalOrder = async (req, res) => {
 
 // /payments/truckOwnerPayment
 const truckOwnerPayment = async (req, res) => {
-  // const truckId = req.query.truckId; // Extract the truckId from the query parameters
-  const truckId = "64fcbc34d30426c5c0112c8a";
+  const truckId = req.query.truckId; // Extract the truckId from the query parameters
+  // const truckId = "64fcbc34d30426c5c0112c8a";
 
   try {
     let priceIds = await adminModel.find({}).select("MonthlyPriceData");
@@ -294,8 +294,8 @@ const truckOwnerPayment = async (req, res) => {
           },
         ],
         mode: "payment",
-        success_url: `http://localhost:3000/truck-owner/pay?success=true`, // CHANGE TO yumtrux.com
-        cancel_url: `http://localhost:3000/truck-owner/pay?canceled=true`, // CHANGE TO yumtrux.com
+        success_url: `https://panel.yumtrux.com/trucksFound`, // CHANGE TO yumtrux.com
+        cancel_url: `https://panel.yumtrux.com/trucksFound`, // CHANGE TO yumtrux.com
         client_reference_id: truckId,
       });
 

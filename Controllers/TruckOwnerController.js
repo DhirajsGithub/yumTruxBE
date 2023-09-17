@@ -43,6 +43,7 @@ const signup = async (req, res) => {
         ownTrucks: [],
         passwordResetToken: "",
         joinOn: new Date(),
+        notifications: [],
       });
 
       const token = jwt.sign(

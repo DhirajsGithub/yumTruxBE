@@ -16,6 +16,9 @@ const {
   updateTruckLocation,
   addTruck,
   updateMenuItem,
+  addNotification,
+  updateNotification,
+  getNotifications,
 } = require("../Controllers/truckController");
 
 const truckRoute = express.Router();
@@ -40,5 +43,12 @@ truckRoute.put("/updateStripePaymentId/:truckId", updateStripePaymentId);
 
 // /truck/updatePaypalEmail/:truckId  --> will update seller's paypal email in db when it's onboarding is done
 truckRoute.put("/updatePaypalEmail/:truckId", updatePaypalEmail);
+
+truckRoute.put("/addNotification", addNotification);
+truckRoute.put(
+  "/updateNotification/:truckId/:notificationId",
+  updateNotification
+);
+truckRoute.get("/getNotifications/:truckId", getNotifications);
 
 module.exports = truckRoute;

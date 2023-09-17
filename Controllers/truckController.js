@@ -146,6 +146,7 @@ const addTruck = async (req, res) => {
       description: "",
       imgUrl: imgUrl,
       address: "",
+      orders: [],
       timing: "",
       ratings: [],
       menu: [],
@@ -495,13 +496,23 @@ const updatePaypalEmail = async (req, res) => {
 const addOrderToTruck = async (req, res) => {
   let truckId = req.params.truckId;
   const order = req.body.order;
+  const notification = req.body.notification;
   if (truckId?.length > 0) {
     if (order) {
       try {
         const findTruck = await trucksModel
           .findByIdAndUpdate(
             { _id: truckId },
-            { $push: { orders: { ...order } } }
+            {
+              $push: {
+                orders: { ...order },
+                notifications: {
+                  ...notification,
+                  date: new Date(),
+                  viewed: false,
+                },
+              },
+            }
           )
           .then((truck) => {
             return res.status(201).send({
@@ -605,6 +616,157 @@ const updateMenuItem = async (req, res) => {
   }
 };
 
+// /truck/addNotification
+const addNotification = async (req, res) => {
+  const ids = req.body.ids; // pass array of truck ids
+  const notification = req.body.notification;
+  if (!notification || !ids) {
+    return res.status(400).send({
+      message: "notification and ids required",
+      status: "error",
+    });
+  }
+  try {
+    let truck = await trucksModel
+      .updateMany(
+        { _id: { $in: ids } },
+        {
+          $push: {
+            notifications: {
+              ...notification,
+              date: new Date(),
+              viewed: false,
+            },
+          },
+        },
+        { multi: true }
+      )
+      .then((truck) => {
+        return res.status(200).send({
+          message: "Successfully updated notifications",
+          status: "success",
+        });
+      })
+      .catch((err) => {
+        return res.status(400).send({
+          message: "Couldn't find the truck",
+          status: "error",
+        });
+      });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Internal server error",
+      status: "error",
+    });
+  }
+};
+
+// /truck/updateNotification/:truckId/:notificationId
+const updateNotification = async (req, res) => {
+  // if deleteNotification is true then delete the notification
+  // else notification viewed will set to true
+  const deleteNotification = req.body.deleteNotification; // boolean
+  const truckId = req.params.truckId;
+  const notificationId = req.params.notificationId;
+  if (!truckId || !notificationId) {
+    return res.status(400).send({
+      message: "truckId and notificationId required",
+      status: "error",
+    });
+  }
+  if (deleteNotification) {
+    try {
+      let truck = await trucksModel
+        .findOneAndUpdate(
+          { _id: truckId },
+          { $pull: { notifications: { notificationId: notificationId } } },
+          { new: true }
+        )
+        .then((truck) => {
+          return res.status(200).send({
+            message: "Successfully deleted the notification",
+            status: "success",
+          });
+        })
+        .catch((err) => {
+          return res.status(400).send({
+            message: "Couldn't find the truck",
+            status: "error",
+          });
+        });
+    } catch (error) {
+      return res.status(500).send({
+        message: "Internal server error",
+        status: "error",
+      });
+    }
+  } else {
+    try {
+      let truck = await trucksModel
+        .findOneAndUpdate(
+          {
+            _id: truckId,
+            notifications: { $elemMatch: { notificationId: notificationId } },
+          },
+          { $set: { "notifications.$.viewed": true } },
+          { new: true }
+        )
+        .then((owner) => {
+          return res.status(200).send({
+            message: "Successfully updated the notification",
+            status: "success",
+          });
+        })
+        .catch((err) => {
+          return res.status(400).send({
+            message: "Couldn't find the truck",
+            status: "error",
+          });
+        });
+    } catch (error) {
+      return res.status(500).send({
+        message: "Internal server error",
+        status: "error",
+      });
+    }
+  }
+};
+
+// /truck/getNotifications/:truckId
+const getNotifications = async (req, res) => {
+  const truckId = req.params.truckId;
+  if (!truckId) {
+    return res.status(400).send({
+      message: "truckId required",
+      status: "error",
+    });
+  }
+  try {
+    let truck = await trucksModel
+      .findById({ _id: truckId })
+      .then((owner) => {
+        return res.status(200).send({
+          notifications: owner.notifications,
+          message: "Successfully fetched the notifications",
+          status: "success",
+        });
+      })
+      .catch((err) => {
+        return res.status(400).send({
+          message: "Couldn't find the truck",
+          status: "error",
+        });
+      });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Internal server error",
+      status: "error",
+    });
+  }
+};
+
+// add notification and update notification api's for truck remaining
+
 module.exports = {
   signup,
   signin,
@@ -620,4 +782,7 @@ module.exports = {
   updateTruckLocation,
   addTruck,
   updateMenuItem,
+  addNotification,
+  updateNotification,
+  getNotifications,
 };

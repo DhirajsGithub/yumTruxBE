@@ -5,6 +5,7 @@ const {
   sample,
   sendEmailForPasswordReset,
   passwordReset,
+  updateOrderStatusByTruck,
 } = require("../Controllers/generalController");
 const generalRoutes = express.Router();
 
@@ -16,5 +17,9 @@ generalRoutes.post("/sendEmailForPasswordReset", sendEmailForPasswordReset);
 
 // generalRoutes/passwordReset    --> run this api after /sendEmailForPasswordReset
 generalRoutes.post("/passwordReset", passwordReset);
+
+// update order status by truck
+// /generalRoutes/updateOrderStatusByTruck
+generalRoutes.put("/updateOrderStatusByTruck", updateOrderStatusByTruck);
 
 module.exports = generalRoutes;
