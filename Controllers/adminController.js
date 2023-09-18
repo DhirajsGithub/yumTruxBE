@@ -721,6 +721,41 @@ const addToAllOrdersDetail = async (req, res) => {
   }
 };
 
+// /admin/getAllOrdersDetail
+const getAllOrdersDetail = async (req, res) => {
+  const adminSecret = req.user.adminSecret;
+  if (adminSecret !== process.env.ADMIN_SECRET) {
+    return res.status(401).json({
+      message: "You are not authorized to access this route",
+      status: "error",
+    });
+  }
+  try {
+    let owner = await adminModel
+      .find({})
+      .then((owner) => {
+        return res.status(200).send({
+          allOrdersDetail: owner[0]?.allOrdersDetail
+            ? owner[0]?.allOrdersDetail
+            : [],
+          message: "Successfully fetched the allOrdersDetail",
+          status: "success",
+        });
+      })
+      .catch((err) => {
+        return res.status(400).send({
+          message: "Couldn't find the truck owner",
+          status: "error",
+        });
+      });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Internal server error",
+      status: "error",
+    });
+  }
+};
+
 module.exports = {
   signin,
   getUsers,
@@ -741,4 +776,5 @@ module.exports = {
   getNotifications,
   getTrucksPayment,
   addToAllOrdersDetail,
+  getAllOrdersDetail,
 };

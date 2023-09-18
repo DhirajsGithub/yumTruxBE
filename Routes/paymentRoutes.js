@@ -40,7 +40,7 @@ router.post("/generatePaypalSignupLink", generatePaypalSignupLink);
 router.post("/createPaypalOrder", createPaypalOrder);
 
 // truck owner payment
-router.post("/truckOwnerPayment/:truckId", truckOwnerPayment);
+router.post("/truckOwnerPayment/", truckOwnerPayment);
 
 const authenticateToken = (req, res, next) => {
   const authToken = req.headers["authorization"];
