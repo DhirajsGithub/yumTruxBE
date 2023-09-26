@@ -11,6 +11,7 @@ const { ObjectId } = require("mongodb");
 
 const uniqid = require("uniqid");
 const { ActionMail } = require("../utils/AdminMail");
+const { SupportMail } = require("../utils/SupportMail");
 
 const SECRET_KEY = "yumtruxsecret69";
 
@@ -756,6 +757,49 @@ const getAllOrdersDetail = async (req, res) => {
   }
 };
 
+// /admin/getCurrentPackage
+const getCurrentPackage = async (req, res) => {
+  let packages = await adminModel.find({}).select("MonthlyPriceData");
+  return res.status(200).json({
+    MonthlyPackage:
+      packages[0]?.MonthlyPriceData?.length > 0
+        ? packages[0]?.MonthlyPriceData[
+            packages[0]?.MonthlyPriceData?.length - 1
+          ]
+        : {},
+    status: "success",
+  });
+};
+
+// /admin/supportEmail
+const supportEmail = async (req, res) => {
+  const { name, email, body, subject } = req.body;
+  const adminEmail = adminModel.find({}).then((admin) => {
+    console.log(admin[0]?.email);
+    if (admin[0]?.email?.includes("@")) {
+      try {
+        console.log("try");
+        SupportMail(name, email, body, subject, admin[0]?.email);
+        return res.status(200).json({
+          message: "Successfully sent the email",
+          status: "success",
+        });
+      } catch (error) {
+        return res.status(500).json({
+          message: "Internal server error",
+          status: "error",
+        });
+      }
+    } else {
+      return res.status(400).json({
+        message: "Admin email not found",
+        status: "error",
+      });
+    }
+  });
+  // console.log(name);
+};
+
 module.exports = {
   signin,
   getUsers,
@@ -777,4 +821,6 @@ module.exports = {
   getTrucksPayment,
   addToAllOrdersDetail,
   getAllOrdersDetail,
+  getCurrentPackage,
+  supportEmail,
 };

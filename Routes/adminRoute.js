@@ -21,6 +21,8 @@ const {
   getTrucksPayment,
   addToAllOrdersDetail,
   getAllOrdersDetail,
+  getCurrentPackage,
+  supportEmail,
 } = require("../Controllers/adminController");
 const adminRoutes = express.Router();
 const jwt = require("jsonwebtoken");
@@ -103,5 +105,11 @@ adminRoutes.put("/addToAllOrdersDetail", addToAllOrdersDetail);
 
 // /admin/getAllOrdersDetail
 adminRoutes.get("/getAllOrdersDetail", authenticateToken, getAllOrdersDetail);
+
+// /admin/getCurrentPackage
+adminRoutes.get("/getCurrentPackage", getCurrentPackage);
+
+// /admin/supportEmail
+adminRoutes.post("/supportEmail", supportEmail);
 
 module.exports = adminRoutes;
