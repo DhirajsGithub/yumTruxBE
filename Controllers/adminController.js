@@ -13,8 +13,6 @@ const uniqid = require("uniqid");
 const { ActionMail } = require("../utils/AdminMail");
 const { SupportMail } = require("../utils/SupportMail");
 
-const SECRET_KEY = "yumtruxsecret69";
-
 // /admin/signin
 const signin = async (req, res) => {
   const { email, password } = req.body;
@@ -43,7 +41,7 @@ const signin = async (req, res) => {
           email: existingAdmin.email,
           adminId: existingAdmin._id,
         },
-        SECRET_KEY,
+        process.env.JWT_SECRET,
         { expiresIn: "2d" }
       );
       sendMail(existingAdmin.email, existingAdmin.name);

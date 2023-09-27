@@ -1,8 +1,8 @@
 // from https://mongoosejs.com/
+require("dotenv").config();
 const mongoose = require("mongoose");
 
-const mongoURI =
-  "mongodb+srv://yumtruxdeveloper:qTApdZWfUX5zWJYE@yumtrux.tjvv0yt.mongodb.net/?retryWrites=true&w=majority";
+const mongoURI = process.env.MONGO_URI;
 
 // can also create a database just using /databse_name
 

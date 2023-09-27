@@ -1,3 +1,4 @@
+require("dotenv").config();
 const truckOwnerModel = require("../Models/TruckOwner");
 const trucksModel = require("../Models/Truck");
 const bcrypt = require("bcrypt");
@@ -6,8 +7,6 @@ const { sendMail } = require("../utils/SendMail");
 const mongoose = require("mongoose");
 const { ObjectId } = require("mongodb");
 const uniqid = require("uniqid");
-
-const SECRET_KEY = "yumtruxsecret69";
 
 // /truckOwner/signup
 const signup = async (req, res) => {
@@ -48,7 +47,7 @@ const signup = async (req, res) => {
 
       const token = jwt.sign(
         { email: result.email, id: result._id },
-        SECRET_KEY,
+        process.env.JWT_SECRET,
         { expiresIn: "2d" }
       );
       return res.status(201).json({
@@ -96,7 +95,7 @@ const signin = async (req, res) => {
       }
       const token = jwt.sign(
         { email: existingTruckOwner.email, id: existingTruckOwner._id },
-        SECRET_KEY,
+        process.env.JWT_SECRET,
         { expiresIn: "2d" }
       );
       sendMail(existingTruckOwner.email, existingTruckOwner.username);

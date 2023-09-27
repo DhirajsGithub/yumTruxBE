@@ -1,3 +1,4 @@
+require("dotenv").config();
 // /truck/signup
 const trucksModel = require("../Models/Truck");
 const truckOwnerModel = require("../Models/TruckOwner");
@@ -6,7 +7,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const uniqid = require("uniqid");
 const { sendMail } = require("../utils/SendMail");
-const SECRET_KEY = "yumtruxsecret69";
 const reqDate = new Date();
 
 // /truck/signup
@@ -53,7 +53,7 @@ const signup = async (req, res) => {
 
       const token = jwt.sign(
         { email: result.email, id: result._id },
-        SECRET_KEY,
+        process.env.JWT_SECRET,
         { expiresIn: "2d" }
       );
       return res.status(201).json({
@@ -102,7 +102,7 @@ const signin = async (req, res) => {
       }
       const token = jwt.sign(
         { email: existingTruck.email, id: existingTruck._id },
-        SECRET_KEY,
+        process.env.JWT_SECRET,
         { expiresIn: "2d" }
       );
       sendMail(existingTruck.email, existingTruck.username);

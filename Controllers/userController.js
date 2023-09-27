@@ -1,3 +1,4 @@
+require("dotenv").config();
 const userModel = require("../Models/User");
 const trucksModel = require("../Models/Truck");
 const fetch = require("node-fetch");
@@ -6,8 +7,6 @@ const jwt = require("jsonwebtoken");
 const uniqid = require("uniqid");
 const { DeleteProfileImgCloudinary } = require("../utils/cloudinary");
 const multer = require("multer");
-
-const SECRET_KEY = "yumtruxsecret69";
 
 const reqDate = new Date();
 
@@ -45,7 +44,10 @@ const signup = async (req, res) => {
       expoPushToken: "",
     });
 
-    const token = jwt.sign({ email: result.email, id: result._id }, SECRET_KEY);
+    const token = jwt.sign(
+      { email: result.email, id: result._id },
+      process.env.JWT_SECRET
+    );
     return res.status(201).send({
       user: result,
       token,
@@ -88,7 +90,7 @@ const signin = async (req, res) => {
       });
     }
     const payload = { id: existingUser._id, email: existingUser.email };
-    const secretKey = SECRET_KEY;
+    const secretKey = process.env.JWT_SECRET;
 
     const token = jwt.sign(payload, secretKey);
 
@@ -360,7 +362,7 @@ const updateTruckRating = async (req, res) => {
 
 const checkToken = (token) => {
   try {
-    const decoded = jwt.verify(token, SECRET_KEY);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     return true;
   } catch (error) {
     return false;
