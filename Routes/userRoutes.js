@@ -18,6 +18,7 @@ const {
   addNotification,
   updateNotification,
   getNotifications,
+  updatePaymentDetails,
 } = require("../Controllers/userController");
 const userRoute = express.Router();
 
@@ -66,5 +67,8 @@ userRoute.put(
 
 // /getNotifications/:userId/
 userRoute.get("/getNotifications/:userId/", getNotifications);
+
+// /updatePaymentDetails/:userId
+userRoute.patch("/updatePaymentDetails/:userId", updatePaymentDetails);
 
 module.exports = userRoute;

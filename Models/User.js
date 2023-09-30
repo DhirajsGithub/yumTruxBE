@@ -48,6 +48,9 @@ const UserSchema = new Schema({
   expoPushToken: {
     type: String,
   },
+  paymentDetails: {
+    type: Object,
+  },
 });
 
 module.exports = mongoose.model("user", UserSchema);

@@ -42,6 +42,7 @@ const signup = async (req, res) => {
       status: "active",
       notifications: [],
       expoPushToken: "",
+      paymentDetails: {},
     });
 
     const token = jwt.sign(
@@ -643,6 +644,42 @@ const getNotifications = async (req, res) => {
   }
 };
 
+const updatePaymentDetails = async (req, res) => {
+  const userId = req.params.userId;
+  const paymentDetails = req.body.paymentDetails;
+  if (!userId) {
+    return res.status(400).send({
+      message: "userId required",
+      status: "error",
+    });
+  }
+  try {
+    let user = await userModel
+      .findByIdAndUpdate(
+        { _id: userId },
+        { $set: { paymentDetails: paymentDetails } },
+        { new: true }
+      )
+      .then((user) => {
+        return res.status(200).send({
+          message: "Successfully updated the payment details",
+          status: "success",
+        });
+      })
+      .catch((err) => {
+        return res.status(400).send({
+          message: "Couldn't find the user",
+          status: "error",
+        });
+      });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Internal server error",
+      status: "error",
+    });
+  }
+};
+
 module.exports = {
   signin,
   signup,
@@ -662,4 +699,5 @@ module.exports = {
   addNotification,
   updateNotification,
   getNotifications,
+  updatePaymentDetails,
 };
