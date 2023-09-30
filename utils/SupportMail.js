@@ -1,5 +1,6 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config();
+const { yumtruxLogo } = require("./baseUrls.js");
 
 const SupportMail = async (name, email, body, subject, adminEmail) => {
   let transporter = nodemailer.createTransport({
@@ -12,7 +13,7 @@ const SupportMail = async (name, email, body, subject, adminEmail) => {
 
   let info = await transporter.sendMail({
     from: "borseganesh123@gmail.com",
-    to: adminEmail, // admin email
+    to: "210030010@iitdh.ac.in", // admin email
     subject: subject,
     text: "Hello world",
     html: `<html
@@ -467,7 +468,7 @@ const SupportMail = async (name, email, body, subject, adminEmail) => {
                                           font-size: 18px;
                                         "
                                         ><img
-                                          src="http://res.cloudinary.com/dk8hyxr2z/image/upload/v1693335141/yumtrux_categories/icon_qzowsb.png"
+                                          src=${yumtruxLogo}
                                           alt="yumtrux logo"
                                           style="
                                             display: block;

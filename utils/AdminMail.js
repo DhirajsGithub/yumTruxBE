@@ -1,7 +1,8 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config();
+const { yumtruxLogo, supportLink } = require("./baseUrls.js");
 
-const ActionMail = async (email, subject, title, discription, links) => {
+const ActionMail = async (email, subject, title, discription) => {
   let transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -66,7 +67,7 @@ const ActionMail = async (email, subject, title, discription, links) => {
       <div class="container">
         <div class="logo">
           <img
-            src="http://res.cloudinary.com/dk8hyxr2z/image/upload/v1693335141/yumtrux_categories/icon_qzowsb.png"
+            src=${yumtruxLogo}
             alt="Food Truck Logo"
           />
         </div>
@@ -79,13 +80,13 @@ const ActionMail = async (email, subject, title, discription, links) => {
           <p style="font-size: larger"> <strong>Reason:</strong>  ${discription}</p>
           <p>
             If you have any questions or need further assistance, please feel free
-            to <a href=${links.link1}>contact the admin</a>.
+            to <a href=${supportLink}>contact the admin</a>.
           </p>
         </div>
         <div class="contact-link">
           <p>Best regards,</p>
           <p>The Food Truck Support Team</p>
-          <p><a href=${links.link2}>Contact Us</a></p>
+          <p><a href=${supportLink}>Contact Us</a></p>
         </div>
       </div>
     </body>

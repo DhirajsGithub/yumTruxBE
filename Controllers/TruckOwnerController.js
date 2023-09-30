@@ -7,6 +7,7 @@ const { sendMail } = require("../utils/SendMail");
 const mongoose = require("mongoose");
 const { ObjectId } = require("mongodb");
 const uniqid = require("uniqid");
+const { defaultUserImg } = require("../utils/baseUrls");
 
 // /truckOwner/signup
 const signup = async (req, res) => {
@@ -36,8 +37,7 @@ const signup = async (req, res) => {
         password: hashPass,
         email,
         phoneNo,
-        imgUrl:
-          "https://res.cloudinary.com/dk8hyxr2z/image/upload/v1685710777/yumtrux_users/defaultProfileImg_rrndub.webp",
+        imgUrl: defaultUserImg,
         address: "",
         ownTrucks: [],
         passwordResetToken: "",

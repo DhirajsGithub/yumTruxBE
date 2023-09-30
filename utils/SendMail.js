@@ -1,5 +1,6 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config();
+const { yumtruxLogo, supportLink } = require("./baseUrls.js");
 
 const sendMail = async (email, username) => {
   let transporter = nodemailer.createTransport({
@@ -393,9 +394,10 @@ const sendMail = async (email, username) => {
                                           font-size: 18px;
                                         "
                                         ><img
-                                          src="https://dckrkd.stripocdn.email/content/guids/CABINET_7ea0cba3985c5538b8b1451fe79a541de07df62886c236834378f8e4e9bd3bc2/images/logo.png"
+                                          src=${yumtruxLogo}
                                           alt="Confirm email"
                                           style="
+                                          margin: 10px;
                                             display: block;
                                             border: 0;
                                             outline: none;
@@ -487,7 +489,7 @@ const sendMail = async (email, username) => {
                                       >
                                         <a
                                           target="_blank"
-                                          href="https://viewstripo.email"
+                                          href=${supportLink}
                                           style="
                                             -webkit-text-size-adjust: none;
                                             -ms-text-size-adjust: none;

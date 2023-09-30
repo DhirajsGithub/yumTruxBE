@@ -4,6 +4,7 @@ const base64 = require("base-64");
 const adminModel = require("../Models/Admin");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const uniqid = require("uniqid");
+const { yumtruxLogo } = require("../utils/baseUrls");
 
 const createPaymentIntents = async (req, res) => {
   try {
@@ -329,9 +330,7 @@ const createNewProduct = async (req, res) => {
   try {
     const product = await stripe.products.create({
       name: name,
-      images: [
-        "https://res.cloudinary.com/dk8hyxr2z/image/upload/v1693335141/yumtrux_categories/icon_qzowsb.png",
-      ],
+      images: [yumtruxLogo],
       description: description,
       default_price_data: {
         unit_amount: price, // make sure to convert the price in cents

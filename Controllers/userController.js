@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 const uniqid = require("uniqid");
 const { DeleteProfileImgCloudinary } = require("../utils/cloudinary");
 const multer = require("multer");
+const { defaultUserImg } = require("../utils/baseUrls");
 
 const reqDate = new Date();
 
@@ -34,8 +35,7 @@ const signup = async (req, res) => {
       fullName: "",
       favouriteTrucks: [],
       orderHistory: [],
-      profileImg:
-        "https://img.freepik.com/premium-vector/account-icon-user-icon-vector-graphics_292645-552.jpg",
+      profileImg: defaultUserImg,
       phoneNo: "",
       address: "",
       passwordResetToken: "",

@@ -350,13 +350,7 @@ const deactivateTruck = async (req, res) => {
             truck.email,
             "YumTrux Truck Status Updated by the admin",
             `Your truck "${truck.name}" has been <strong style="color: #ef5350">Deactivated</strong> by the yumtrux admin.`,
-            reason,
-            {
-              link1:
-                "https://www.google.com/search?sca_esv=561067008&rlz=1C5CHFA_enIN977IN977&sxsrf=AB5stBh5C3K2Jox5gEY7QmxdqeMbv5tVuQ:1693335084372&q=food+truck&tbm=isch&source=lnms&sa=X&ved=2ahUKEwjI9cHhxIKBAxVrS2wGHVpEAGcQ0pQJegQICxAB&biw=1440&bih=783&dpr=2#imgrc=vmQ6Qy833491nM",
-              link2:
-                "https://www.google.com/search?sca_esv=561067008&rlz=1C5CHFA_enIN977IN977&sxsrf=AB5stBh5C3K2Jox5gEY7QmxdqeMbv5tVuQ:1693335084372&q=food+truck&tbm=isch&source=lnms&sa=X&ved=2ahUKEwjI9cHhxIKBAxVrS2wGHVpEAGcQ0pQJegQICxAB&biw=1440&bih=783&dpr=2#imgrc=7nmFwd-wgzg2MM",
-            }
+            reason
           );
         }
         return res.status(201).send({
@@ -399,13 +393,7 @@ const activateTruck = async (req, res) => {
             truck.email,
             "YumTrux Truck Status Updated by the admin",
             `Your truck "${truck.name}" has been <strong style="color:#4caf50">Activated</strong> by the yumtrux admin.`,
-            reason,
-            {
-              link1:
-                "https://www.google.com/search?sca_esv=561067008&rlz=1C5CHFA_enIN977IN977&sxsrf=AB5stBh5C3K2Jox5gEY7QmxdqeMbv5tVuQ:1693335084372&q=food+truck&tbm=isch&source=lnms&sa=X&ved=2ahUKEwjI9cHhxIKBAxVrS2wGHVpEAGcQ0pQJegQICxAB&biw=1440&bih=783&dpr=2#imgrc=vmQ6Qy833491nM",
-              link2:
-                "https://www.google.com/search?sca_esv=561067008&rlz=1C5CHFA_enIN977IN977&sxsrf=AB5stBh5C3K2Jox5gEY7QmxdqeMbv5tVuQ:1693335084372&q=food+truck&tbm=isch&source=lnms&sa=X&ved=2ahUKEwjI9cHhxIKBAxVrS2wGHVpEAGcQ0pQJegQICxAB&biw=1440&bih=783&dpr=2#imgrc=7nmFwd-wgzg2MM",
-            }
+            reason
           );
         }
         return res.status(201).send({

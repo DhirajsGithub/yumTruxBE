@@ -7,6 +7,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const uniqid = require("uniqid");
 const { sendMail } = require("../utils/SendMail");
+const { truckDefaultImg } = require("../utils/baseUrls");
 const reqDate = new Date();
 
 // /truck/signup
@@ -41,8 +42,7 @@ const signup = async (req, res) => {
         schedule: [],
         latLong: [],
         description: "",
-        imgUrl:
-          "https://assets.traveltriangle.com/blog/wp-content/uploads/2019/08/shutterstock_1095843908.jpg",
+        imgUrl: truckDefaultImg,
         address,
         timing: "",
         ratings: [],
