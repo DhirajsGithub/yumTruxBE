@@ -39,12 +39,7 @@ app.use(
   })
 );
 
-const corsOptions = {
-  origin: "https://admin.yumtrux.com",
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  credentials: true, // If you need to handle cookies or sessions
-};
-app.use(cors(corsOptions));
+app.use(cors());
 
 app.use(express.json());
 app.use("/", userRoutes);
