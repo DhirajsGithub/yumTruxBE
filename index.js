@@ -186,6 +186,6 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(port, () => {
-  console.log(`YumTrux backend app listening at http://localhost:${port}`);
+httpsServer.listen(port, () => {
+  console.log(`YumTrux backend app listening at https://yourdomain.com:${port}`);
 });
